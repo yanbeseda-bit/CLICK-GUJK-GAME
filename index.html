@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8" />
-<title>Modern Clicker Ultra</title>
+<title>Modern Clicker Ultra RU</title>
 <style>
 :root { --bg: #020617; --card: #111827; --accent: #3b82f6; --green: #22c55e; --purple: #a855f7; --gold: #fbbf24; }
 body { font-family: 'Segoe UI', Arial; background: var(--bg); color: white; margin: 0; overflow: hidden; display: flex; height: 100vh; }
@@ -42,7 +42,6 @@ button:disabled { background: #334155; cursor: not-allowed; transform: none; }
         <p>Цена: <span id="coinUpgradeCost">5</span> 🪙</p>
         <button onclick="buyCoinUpgrade()">Купить</button>
     </div>
-    <!-- СЕКРЕТНЫЙ МАГАЗИН -->
     <div id="secretShop" style="display: none;">
         <div class="card" style="border: 1px solid var(--gold);">
             <h3 style="color: var(--gold);">🌟 Супер Клик</h3>
@@ -55,10 +54,10 @@ button:disabled { background: #334155; cursor: not-allowed; transform: none; }
 
 <div class="main-area">
     <div class="card" style="width: 320px;">
-        <div>💰 Гроші: <span id="money" style="color:var(--accent)">0</span></div>
-        <div>🪙 Монети: <span id="coins" style="color:var(--gold)">0</span></div>
-        <div>🔥 Ребірти: <span id="rebirths" style="color:var(--purple)">0</span></div>
-        <div>⭐ Поінти: <span id="points" style="color:var(--green)">0</span></div>
+        <div>💰 Деньги: <span id="money" style="color:var(--accent)">0</span></div>
+        <div>🪙 Монеты: <span id="coins" style="color:var(--gold)">0</span></div>
+        <div>🔥 Ребирты: <span id="rebirths" style="color:var(--purple)">0</span></div>
+        <div>⭐ Поинты: <span id="points" style="color:var(--green)">0</span></div>
     </div>
 
     <button onclick="openTree()" style="width: 220px; background: var(--purple); margin-bottom:10px">🕸️ Ветка ребиртов</button>
@@ -69,6 +68,8 @@ button:disabled { background: #334155; cursor: not-allowed; transform: none; }
         <p>Нужно: <span id="rebCostText">100,000</span></p>
         <button onclick="rebirth()" style="background: var(--purple);">Сделать</button>
     </div>
+    
+    <button onclick="resetGame()" style="background: #ef4444; width: auto; font-size: 10px; margin-top: 10px;">Сбросить прогресс</button>
 </div>
 
 <div class="side-panel right">
@@ -105,10 +106,8 @@ button:disabled { background: #334155; cursor: not-allowed; transform: none; }
 <script>
 let money=0, coins=0, rebirths=0, points=0;
 let moneyUpgrade=0, coinUpgrade=0, moneyUpgradeCost=50, coinUpgradeCost=5;
-let autoLevel=0, autoCost=2000, x3Level=0, x3Costs =;
+let autoLevel=0, autoCost=2000, x3Level=0, x3Costs = [10000, 200000, 900000, 7000000, 82000000];
 let superLevel=0, superCost=200;
-
-// Бонусы ветки
 let treeX2=1, treeBonusCoins=0, critChance=0, autoMult=1, secretUnlocked=false, boughtNodes=[];
 
 function getTotalClick() {
@@ -149,7 +148,6 @@ function rebirth() {
     }
 }
 
-// Ветка
 const treeMap = document.getElementById('treeMap');
 let isDragging=false, startX, startY;
 function openTree() { 
@@ -195,13 +193,15 @@ setInterval(() => { if(autoLevel > 0){ money += (autoLevel * getTotalClick() * a
 
 function save() {
     const data = { money, coins, rebirths, points, moneyUpgrade, coinUpgrade, moneyUpgradeCost, coinUpgradeCost, autoLevel, autoCost, x3Level, superLevel, superCost, boughtNodes, treeX2, treeBonusCoins, critChance, autoMult, secretUnlocked };
-    localStorage.setItem('clicker_ultra_save_v4', JSON.stringify(data));
+    localStorage.setItem('clicker_final_rus_v5', JSON.stringify(data));
 }
 
 function load() {
-    let s = JSON.parse(localStorage.getItem('clicker_ultra_save_v4'));
+    let s = JSON.parse(localStorage.getItem('clicker_final_rus_v5'));
     if(s) { Object.assign(window, s); updateUI(); }
 }
+
+function resetGame() { if(confirm("Вы уверены, что хотите сбросить ВЕСЬ прогресс?")) { localStorage.clear(); location.reload(); } }
 
 window.onload = load;
 </script>

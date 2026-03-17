@@ -2,119 +2,101 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8" />
-<title>Modern Clicker</title>
+<title>Clicker Evolution</title>
 <style>
-body{
-font-family:Segoe UI,Arial;
-background:linear-gradient(135deg,#0f172a,#020617);
-color:white;
-text-align:center;
-margin:0;
-padding:0;
-}
+body{margin:0;font-family:Segoe UI;background:linear-gradient(135deg,#020617,#0f172a);color:white;overflow:hidden}
 
-h1{margin-top:20px}
+.topbar{position:fixed;top:10px;left:0;right:0;text-align:center;z-index:5}
 
-.container{
-max-width:900px;
-margin:auto;
-padding:20px;
-}
+.branchBtn{background:linear-gradient(135deg,#a855f7,#7c3aed);border:none;padding:10px 18px;border-radius:14px;color:white;font-size:15px;cursor:pointer}
 
-.card{
-background:#111827;
-border-radius:20px;
-padding:20px;
-margin:15px;
-box-shadow:0 0 20px rgba(0,0,0,0.5);
-}
-
-button{
-background:linear-gradient(135deg,#22c55e,#16a34a);
+.mainClick{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+font-size:30px;
+padding:30px 60px;
+border-radius:30px;
 border:none;
-color:white;
-padding:12px 22px;
-margin-top:10px;
-border-radius:14px;
-font-size:16px;
-cursor:pointer;
-transition:.2s;
-}
-
-button:hover{
-transform:scale(1.07);
-}
-
-.bigClick{
-font-size:28px;
-padding:20px 40px;
-border-radius:20px;
 background:linear-gradient(135deg,#3b82f6,#2563eb);
+color:white;
+cursor:pointer;
+transition:.1s;
 }
 
-.stat{
-font-size:18px;
-margin:6px;
+.mainClick:active{transform:translate(-50%,-50%) scale(.9)}
+
+.panel{
+position:fixed;
+top:0;
+bottom:0;
+width:260px;
+overflow-y:auto;
+padding:15px;
 }
+
+.left{left:0;background:#020617aa}
+.right{right:0;background:#020617aa}
+
+.card{background:#111827;margin-bottom:12px;padding:12px;border-radius:14px}
+button{margin-top:6px;width:100%;padding:8px;border-radius:10px;border:none;background:#22c55e;color:white;cursor:pointer}
+
+.stats{position:fixed;bottom:10px;left:50%;transform:translateX(-50%);text-align:center}
+
+.clickAnim{position:absolute;font-weight:bold;pointer-events:none;animation:fly .6s forwards}
+
+@keyframes fly{
+0%{opacity:1;transform:translateY(0)}
+100%{opacity:0;transform:translateY(-60px)}
+}
+
+.branchScreen{
+position:fixed;
+inset:0;
+background:#000c;
+display:none;
+overflow:hidden;
+}
+
+.branchMap{
+position:absolute;
+width:2000px;
+height:2000px;
+cursor:grab;
+}
+
+.node{
+position:absolute;
+padding:10px 14px;
+background:#7c3aed;
+border-radius:14px;
+cursor:pointer;
+white-space:nowrap
+}
+
 </style>
 </head>
 <body>
-<div class="container">
-<h1>⚡ Modern Clicker</h1>
 
-<div class="card">
-<div class="stat">💰 Деньги: <span id="money">0</span></div>
-<div class="stat">🪙 Монеты: <span id="coins">0</span></div>
-<div class="stat">🔥 Ребирты: <span id="rebirths">0</span></div>
-<div class="stat">⭐ Поинты: <span id="points">0</span></div>
-<div class="stat">👆 Сила клика: <span id="clickPower">1</span></div>
-<div class="stat">🎯 Шанс монеты: <span id="coinChance">1%</span></div>
-
-<button class="bigClick" onclick="clickMoney()">👆 КЛИК</button>
+<div class="topbar">
+<button class="branchBtn" onclick="toggleBranch()">🌌 Ветка ребиртов</button>
 </div>
 
-<div class="card">
-<h3>💸 Улучшение клика</h3>
-Цена: <span id="moneyUpgradeCost">50</span>
-<br>
-<button onclick="buyMoneyUpgrade()">Купить</button>
+<button class="mainClick" onclick="clickMoney(event)">КЛИК</button>
+
+<div class="panel left" id="coinPanel"></div>
+<div class="panel right" id="clickPanel"></div>
+
+<div class="stats">
+💰 <span id="money">0</span>
+🪙 <span id="coins">0</span>
+🔥 <span id="rebirths">0</span>
+⭐ <span id="points">0</span>
 </div>
 
-<div class="card">
-<h3>🪙 Улучшение за монеты</h3>
-Цена: <span id="coinUpgradeCost">5</span>
-<br>
-<button onclick="buyCoinUpgrade()">Купить</button>
-</div>
-
-<div class="card">
-<h3>🎯 Улучшение шанса монеты</h3>
-Цена: <span id="chanceCost">500</span>
-<br>
-<button onclick="buyChance()">Купить</button>
-<div id="chanceMax"></div>
-</div>
-
-<div class="card">
-<h3>⚡ x2 к клику</h3>
-Цена: <span id="x2Cost">1000</span>
-<br>
-<button onclick="buyX2()">Купить</button>
-</div>
-
-<div class="card">
-<h3>🤖 Автокликер (моё улучшение)</h3>
-Цена: <span id="autoCost">2000</span>
-<br>
-<button onclick="buyAuto()">Купить</button>
-</div>
-
-<div class="card">
-<h3>♻️ Ребирт</h3>
-Нужно 100000
-<br>
-<button onclick="rebirth()">Сделать</button>
-</div>
+<div class="branchScreen" id="branchScreen">
+<div class="branchMap" id="branchMap"></div>
 </div>
 
 <script>
@@ -123,145 +105,145 @@ let coins=0
 let rebirths=0
 let points=0
 
-let moneyUpgrade=0
-let coinUpgrade=0
+let clickAdd=0
+let clickMulti=1
+let rebirthMulti=1
 
-let moneyUpgradeCost=50
-let coinUpgradeCost=5
-
-let chanceLevel=0
-let chanceCostList=[500,3000,11000,28000,36000]
-let chanceCost=500
 let coinChance=0.01
+let bonusCoins=0
 
-let x2Level=0
-let x2Cost=1000
-let x2Multi=1
+let rebirthCost=100000
 
-let autoLevel=0
-let autoCost=2000
+let branchUnlocked=false
 
 function totalClick(){
-let base = 1 + moneyUpgrade + coinUpgrade
-let reb = Math.pow(2,rebirths)
-return base * reb * x2Multi
+return (1+clickAdd)*clickMulti*rebirthMulti
 }
 
-function clickMoney(){
-money += totalClick()
-if(Math.random() < coinChance) coins++
+function clickMoney(e){
+let val=totalClick()
+money+=val
+
+if(Math.random()<coinChance) coins+=1+bonusCoins
+
+spawnAnim(e,val)
 update()
 }
 
-function buyMoneyUpgrade(){
-if(money>=moneyUpgradeCost){
-money-=moneyUpgradeCost
-moneyUpgrade++
-moneyUpgradeCost*=2
-update()
-}
-}
+function spawnAnim(e,val){
+let d=document.createElement('div')
+d.className='clickAnim'
+d.innerText='+'+val
 
-function buyCoinUpgrade(){
-if(coins>=coinUpgradeCost){
-coins-=coinUpgradeCost
-coinUpgrade++
-coinUpgradeCost*=2
-update()
-}
-}
+d.style.left=e.clientX+'px'
+d.style.top=e.clientY+'px'
 
-function buyChance(){
-if(chanceLevel>=10){
-document.getElementById('chanceMax').innerText="МАКСИМУМ"
-return
+document.body.appendChild(d)
+setTimeout(()=>d.remove(),600)
 }
-
-if(money>=chanceCost){
-money-=chanceCost
-chanceLevel++
-coinChance+=0.005
-
-if(chanceLevel<5) chanceCost = chanceCostList[chanceLevel]
-else chanceCost = Math.floor(chanceCost*1.5)
-
-update()
-}
-}
-
-function buyX2(){
-if(money>=x2Cost){
-money-=x2Cost
-x2Level++
-x2Multi*=2
-if(x2Level==1) x2Cost=6000
-else x2Cost=Math.floor(x2Cost*2.5)
-update()
-}
-}
-
-function buyAuto(){
-if(money>=autoCost){
-money-=autoCost
-autoLevel++
-autoCost*=2
-update()
-}
-}
-
-setInterval(()=>{
-money += autoLevel * totalClick()
-update()
-},1000)
 
 function rebirth(){
-if(money>=100000){
+if(money>=rebirthCost){
 rebirths++
 points++
+rebirthMulti*=2
+
 money=0
 coins=0
-moneyUpgrade=0
-coinUpgrade=0
-moneyUpgradeCost=50
-coinUpgradeCost=5
-x2Level=0
-x2Cost=1000
-x2Multi=1
-autoLevel=0
-autoCost=2000
-chanceLevel=0
+clickAdd=0
+clickMulti=1
 coinChance=0.01
-chanceCost=500
-save()
+
+if(rebirths==1) rebirthCost=20000000
+
 update()
 }
 }
 
-function save(){
-localStorage.setItem('clickerSave',JSON.stringify({money,coins,rebirths,points,moneyUpgrade,coinUpgrade,moneyUpgradeCost,coinUpgradeCost,chanceLevel,coinChance,chanceCost,x2Level,x2Cost,x2Multi,autoLevel,autoCost}))
+// ветка
+
+let map=document.getElementById('branchMap')
+
+let nodes=[
+{
+x:950,y:950,
+text:'x2 к клику +1 монета',
+buy(){
+if(points>=1){
+points--
+clickMulti*=2
+bonusCoins+=1
+this.bought=true
+spawnNext()
+}
+}
+}
+]
+
+function spawnNext(){
+if(branchUnlocked) return
+branchUnlocked=true
+
+createNode(1100,950,'x3 клику 10k',()=>buyX3(10000))
+createNode(1250,950,'x3 клику 200k',()=>buyX3(200000))
+createNode(1400,950,'x3 клику 900k',()=>buyX3(900000))
+createNode(1550,950,'x3 клику 7m',()=>buyX3(7000000))
+createNode(1700,950,'x3 клику 82m',()=>buyX3(82000000))
 }
 
-function load(){
-let s = JSON.parse(localStorage.getItem('clickerSave'))
-if(s){Object.assign(window,s)}
+function createNode(x,y,text,fn){
+let n=document.createElement('div')
+n.className='node'
+n.style.left=x+'px'
+n.style.top=y+'px'
+n.innerText=text
+n.onclick=fn
+map.appendChild(n)
+}
+
+function buyX3(cost){
+if(money>=cost){
+money-=cost
+clickMulti*=3
+update()
+}
+}
+
+nodes.forEach(n=>{
+let d=document.createElement('div')
+d.className='node'
+d.style.left=n.x+'px'
+d.style.top=n.y+'px'
+d.innerText=n.text
+
+d.onclick=()=>n.buy()
+map.appendChild(d)
+})
+
+// движение карты
+let isDrag=false, sx=0, sy=0
+map.onmousedown=e=>{isDrag=true;sx=e.clientX-map.offsetLeft;sy=e.clientY-map.offsetTop}
+document.onmouseup=()=>isDrag=false
+document.onmousemove=e=>{
+if(isDrag){
+map.style.left=e.clientX-sx+'px'
+map.style.top=e.clientY-sy+'px'
+}
+}
+
+function toggleBranch(){
+let s=document.getElementById('branchScreen')
+s.style.display=s.style.display=='block'?'none':'block'
 }
 
 function update(){
-document.getElementById('money').innerText=Math.floor(money)
+money=Math.floor(money)
+document.getElementById('money').innerText=money
 document.getElementById('coins').innerText=coins
 document.getElementById('rebirths').innerText=rebirths
 document.getElementById('points').innerText=points
-document.getElementById('clickPower').innerText=totalClick()
-document.getElementById('moneyUpgradeCost').innerText=moneyUpgradeCost
-document.getElementById('coinUpgradeCost').innerText=coinUpgradeCost
-document.getElementById('chanceCost').innerText=chanceCost
-document.getElementById('coinChance').innerText=(coinChance*100).toFixed(1)+'%'
-document.getElementById('x2Cost').innerText=x2Cost
-document.getElementById('autoCost').innerText=autoCost
-save()
 }
 
-load()
 update()
 </script>
 </body>

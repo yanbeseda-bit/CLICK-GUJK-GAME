@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8" />
-<title>Modern Clicker Ultra Final</title>
+<title>Modern Clicker Ultra Admin Edition</title>
 <style>
 :root { --bg: #020617; --card: #111827; --accent: #3b82f6; --green: #22c55e; --purple: #a855f7; --gold: #fbbf24; }
 body { font-family: 'Segoe UI', Arial; background: var(--bg); color: white; margin: 0; overflow: hidden; display: flex; height: 100vh; }
@@ -68,6 +68,11 @@ button:disabled { background: #334155; cursor: not-allowed; transform: none; }
         <p id="rebInfo">Нужно: 100,000</p>
         <button onclick="rebirth()" style="background: var(--purple);">Сделать</button>
     </div>
+
+    <!-- КНОПКА ДЛЯ ЧИТ-КОДА -->
+    <button onclick="enterPromoCode()" style="background: #334155; width: auto; font-size: 10px; margin-top: 5px;">Ввести код</button>
+    
+    <button onclick="resetGame()" style="background: #ef4444; width: auto; font-size: 10px; margin-top: 20px;">СБРОСИТЬ ВСЁ</button>
 </div>
 
 <div class="side-panel right">
@@ -115,7 +120,7 @@ button:disabled { background: #334155; cursor: not-allowed; transform: none; }
 let money=0, coins=0, rebirths=0, points=0;
 let moneyUpgrade=0, coinUpgrade=0, moneyUpgradeCost=30, coinUpgradeCost=5;
 let autoLevel=0, autoCost=2000, x3Level=0, x3Costs =;
-let x5Level=0, x5Costs = [12000000, 210000000];
+let x5Level=0, x5Costs =;
 let superLevel=0, superCost=200;
 let treeX2=1, treeBonusCoins=0, critChance=0, autoMult=1, secretUnlocked=false, x5Unlocked=false, boughtNodes=[];
 
@@ -148,8 +153,20 @@ function buyX5() { if(x5Level<2 && money>=x5Costs[x5Level]){ money-=x5Costs[x5Le
 function buyAuto() { if(money>=autoCost){ money-=autoCost; autoLevel++; autoCost*=2; updateUI(); } }
 function buySuperClick() { if(coins>=superCost){ coins-=superCost; superLevel++; superCost*=3; updateUI(); } }
 
+// ФУНКЦИЯ ДЛЯ АДМИН-КОДА
+function enterPromoCode() {
+    let code = prompt("Введите секретный код:");
+    if(code === "GUJK1228CV") {
+        money += 10000000;
+        alert("Код принят! Вы получили 10,000,000 кликов!");
+        updateUI();
+    } else {
+        alert("Неверный код!");
+    }
+}
+
 function getRebirthCost() {
-    let costs = [100000, 7000000, 100000000, 6000000000];
+    let costs =;
     return rebirths < costs.length ? costs[rebirths] : costs[costs.length-1] * Math.pow(10, rebirths-3);
 }
 
@@ -212,13 +229,15 @@ setInterval(() => { if(autoLevel > 0){ money += (autoLevel * getTotalClick() * a
 
 function save() {
     const data = { money, coins, rebirths, points, moneyUpgrade, coinUpgrade, moneyUpgradeCost, coinUpgradeCost, autoLevel, autoCost, x3Level, x5Level, superLevel, superCost, boughtNodes, treeX2, treeBonusCoins, critChance, autoMult, secretUnlocked, x5Unlocked };
-    localStorage.setItem('clicker_final_rus_v6', JSON.stringify(data));
+    localStorage.setItem('clicker_admin_rus_v7', JSON.stringify(data));
 }
 
 function load() {
-    let s = JSON.parse(localStorage.getItem('clicker_final_rus_v6'));
+    let s = JSON.parse(localStorage.getItem('clicker_admin_rus_v7'));
     if(s) { Object.assign(window, s); updateUI(); }
 }
+
+function resetGame() { if(confirm("Сбросить ВЕСЬ прогресс?")) { localStorage.clear(); location.reload(); } }
 
 window.onload = load;
 </script>

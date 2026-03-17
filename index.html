@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8" />
-<title>Modern Clicker Ultra Final Save</title>
+<title>Modern Clicker Ultra Final - No Coin Reset</title>
 <style>
 :root { --bg: #020617; --card: #111827; --accent: #3b82f6; --green: #22c55e; --purple: #a855f7; --gold: #fbbf24; }
 body { font-family: 'Segoe UI', Arial; background: var(--bg); color: white; margin: 0; overflow: hidden; display: flex; height: 100vh; width: 100vw; }
@@ -118,7 +118,7 @@ button:disabled { background: #334155 !important; cursor: default; transform: no
 </div>
 
 <script>
-// Глобальный объект состояния - сохраняется целиком
+// Глобальный объект состояния
 let state = {
     money: 0, coins: 0, rebirths: 0, points: 0,
     moneyUpgrade: 0, coinUpgrade: 0, moneyUpgradeCost: 30, coinUpgradeCost: 3,
@@ -128,7 +128,7 @@ let state = {
     secretUnlocked: false, x5Unlocked: false, boughtNodes: []
 };
 
-const x3Costs = [7500, 45000, 280000, 1500000, 9000000];
+const x3Costs = [7500, 50000, 250000, 1500000, 10000000];
 const x5Costs = [65000000, 450000000, 1800000000];
 
 function formatNum(num) {
@@ -169,8 +169,8 @@ function buySuperClick() { if(state.coins>=state.superCost){ state.coins-=state.
 
 function getChanceCost() {
     let lvl = state.chanceUpgradeLevel;
-    if(lvl < 6) return (lvl + 1) * 5; // 5, 10, 15, 20, 25, 30
-    return 30 * Math.pow(2, lvl - 5); // Удвоение после 6 уровня
+    if(lvl < 6) return (lvl + 1) * 5; 
+    return 30 * Math.pow(2, lvl - 5); 
 }
 
 function buyChanceUpgrade() {
@@ -179,7 +179,7 @@ function buyChanceUpgrade() {
     if(state.coins >= cost) {
         state.coins -= cost;
         state.chanceUpgradeLevel++;
-        state.coinChanceBase += 0.01; // Всегда +1%
+        state.coinChanceBase += 0.01; 
         if(state.coinChanceBase > 0.30) state.coinChanceBase = 0.30;
         updateUI();
     }
@@ -190,10 +190,13 @@ function getRebirthCost() {
     return state.rebirths < rebCosts.length ? rebCosts[state.rebirths] : rebCosts[rebCosts.length-1] * Math.pow(10, state.rebirths-3);
 }
 
+// ИЗМЕНЕНО: Монеты больше не обнуляются
 function rebirth() {
     if(state.money >= getRebirthCost()){
         state.rebirths++; state.points++;
-        state.money=0; state.coins=0; state.moneyUpgrade=0; state.coinUpgrade=0;
+        state.money=0; 
+        // state.coins = state.coins; // Мы просто не трогаем state.coins
+        state.moneyUpgrade=0; state.coinUpgrade=0;
         state.moneyUpgradeCost=30; state.coinUpgradeCost=3;
         state.autoLevel=0; state.autoCost=2000; state.x3Level=0; state.x5Level=0;
         state.superLevel=0; state.superCost=200;
@@ -235,7 +238,6 @@ function updateUI() {
     document.getElementById('rebInfo').innerText = "Нужно: " + formatNum(getRebirthCost());
     document.getElementById('superCost').innerText = formatNum(state.superCost);
     
-    // UI Шанса
     let chanceBtn = document.getElementById('chanceBtn');
     document.getElementById('curChanceText').innerText = (state.coinChanceBase * 100).toFixed(0) + '%';
     if(state.coinChanceBase >= 0.30) {
@@ -271,7 +273,6 @@ function updateUI() {
         let n = document.getElementById('node'+id);
         if(n) n.classList.add('bought');
     });
-    save();
 }
 
 function enterPromoCode() {
@@ -280,11 +281,11 @@ function enterPromoCode() {
 }
 
 function save() {
-    localStorage.setItem('clicker_ultra_final_save_v12', JSON.stringify(state));
+    localStorage.setItem('clicker_ultimate_v13', JSON.stringify(state));
 }
 
 function load() {
-    let s = localStorage.getItem('clicker_ultra_final_save_v12');
+    let s = localStorage.getItem('clicker_ultimate_v13');
     if(s) {
         state = Object.assign(state, JSON.parse(s));
     }
@@ -293,8 +294,9 @@ function load() {
 setInterval(() => { 
     if(state.autoLevel > 0){ 
         state.money += (state.autoLevel * getTotalClick() * state.autoMult) / 2; 
-        updateUI(); 
     } 
+    updateUI();
+    save();
 }, 1000);
 
 function resetGame() { 

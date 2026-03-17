@@ -2,34 +2,35 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8" />
-<title>Modern Clicker Admin Edition Fix</title>
+<title>Modern Clicker Ultra FIX FINAL</title>
 <style>
 :root { --bg: #020617; --card: #111827; --accent: #3b82f6; --green: #22c55e; --purple: #a855f7; --gold: #fbbf24; }
-body { font-family: 'Segoe UI', Arial; background: var(--bg); color: white; margin: 0; overflow: hidden; display: flex; height: 100vh; }
+body { font-family: 'Segoe UI', Arial; background: var(--bg); color: white; margin: 0; overflow: hidden; display: flex; height: 100vh; width: 100vw; }
 
-/* Боковые панели */
-.side-panel { width: 280px; background: rgba(17, 24, 39, 0.95); padding: 20px; overflow-y: auto; border-right: 1px solid #1e293b; z-index: 10; pointer-events: all; }
+/* Панели */
+.side-panel { width: 280px; background: rgba(17, 24, 39, 0.98); padding: 20px; overflow-y: auto; border-right: 1px solid #1e293b; z-index: 20; position: relative; }
 .side-panel.right { border-right: none; border-left: 1px solid #1e293b; }
 
-.main-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; z-index: 5; pointer-events: all; }
+.main-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; z-index: 10; }
 .card { background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); text-align: center; border: 1px solid #1e293b; width: 100%; box-sizing: border-box; }
 
-button { background: linear-gradient(135deg, var(--green), #16a34a); border: none; color: white; padding: 12px; border-radius: 10px; cursor: pointer; transition: 0.2s; font-weight: bold; width: 100%; margin-top: 5px; pointer-events: all; }
+/* КНОПКИ */
+button { background: linear-gradient(135deg, var(--green), #16a34a); border: none; color: white; padding: 12px; border-radius: 10px; cursor: pointer; transition: 0.2s; font-weight: bold; width: 100%; margin-top: 5px; position: relative; z-index: 30; }
 button:hover { transform: scale(1.03); filter: brightness(1.1); }
 button:active { transform: scale(0.95); }
 
-.bigClick { font-size: 35px; padding: 40px 80px; border-radius: 30px; background: linear-gradient(135deg, #3b82f6, #2563eb); width: auto; box-shadow: 0 0 30px rgba(59, 130, 246, 0.4); }
+.bigClick { font-size: 35px; padding: 40px 80px; border-radius: 30px; background: linear-gradient(135deg, #3b82f6, #2563eb); width: auto; box-shadow: 0 0 30px rgba(59, 130, 246, 0.4); margin-top: 10px; }
 
-/* ИСПРАВЛЕНИЕ: Окно ветки теперь не блокирует клики, когда закрыто */
-#treeModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 100; overflow: hidden; pointer-events: all; }
-#treeMap { position: absolute; width: 3000px; height: 3000px; cursor: grab; background: radial-gradient(#1e293b 1px, transparent 1px) 0 0 / 50px 50px; pointer-events: all; }
-
-.node { position: absolute; width: 180px; height: 180px; background: #1e293b; border: 3px solid #334155; border-radius: 50%; text-align: center; cursor: pointer; transform: translate(-50%, -50%); transition: 0.3s; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px; box-sizing: border-box; font-size: 13px; pointer-events: all; }
+/* ВЕТКА (ИСПРАВЛЕНО) */
+#treeModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; overflow: hidden; }
+#treeMap { position: absolute; width: 3000px; height: 3000px; cursor: grab; background: radial-gradient(#1e293b 1px, transparent 1px) 0 0 / 50px 50px; }
+.node { position: absolute; width: 180px; height: 180px; background: #1e293b; border: 3px solid #334155; border-radius: 50%; text-align: center; cursor: pointer; transform: translate(-50%, -50%); transition: 0.3s; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px; box-sizing: border-box; font-size: 13px; }
 .node.bought { background: var(--purple); border-color: #c084fc; box-shadow: 0 0 30px rgba(168, 85, 247, 0.5); }
-.close-tree { position: fixed; top: 20px; right: 20px; width: auto; z-index: 101; background: #ef4444; }
+.close-tree { position: fixed; top: 20px; right: 20px; width: auto; z-index: 1100; background: #ef4444; }
 
-.click-anim { position: absolute; pointer-events: none; color: #60a5fa; font-weight: bold; font-size: 26px; animation: fly 0.7s forwards; text-shadow: 0 0 5px black; }
+.click-anim { position: absolute; pointer-events: none; color: #60a5fa; font-weight: bold; font-size: 26px; animation: fly 0.7s forwards; text-shadow: 0 0 5px black; z-index: 100; }
 @keyframes fly { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-130px); opacity: 0; } }
+.crit { color: var(--gold) !important; font-size: 40px !important; }
 </style>
 </head>
 <body>
@@ -116,8 +117,8 @@ button:active { transform: scale(0.95); }
 <script>
 let money=0, coins=0, rebirths=0, points=0;
 let moneyUpgrade=0, coinUpgrade=0, moneyUpgradeCost=30, coinUpgradeCost=5;
-let autoLevel=0, autoCost=2000, x3Level=0, x3Costs =;
-let x5Level=0, x5Costs =;
+let autoLevel=0, autoCost=2000, x3Level=0, x3Costs = [7500, 200000, 900000, 7000000, 82000000];
+let x5Level=0, x5Costs = [12000000, 210000000];
 let superLevel=0, superCost=200;
 let treeX2=1, treeBonusCoins=0, critChance=0, autoMult=1, secretUnlocked=false, x5Unlocked=false, boughtNodes=[];
 
@@ -154,7 +155,7 @@ function enterPromoCode() {
     let code = prompt("Введите секретный код:");
     if(code === "GUJK1228CV") {
         money += 10000000;
-        alert("Код принят! Вы получили 10,000,000!");
+        alert("Код принят! Вы получили 10,000,000 кликов!");
         updateUI();
     } else {
         alert("Неверный код!");
@@ -162,7 +163,7 @@ function enterPromoCode() {
 }
 
 function getRebirthCost() {
-    let costs =;
+    let costs = [100000, 7000000, 100000000, 6000000000];
     return rebirths < costs.length ? costs[rebirths] : costs[costs.length-1] * Math.pow(10, rebirths-3);
 }
 
@@ -175,13 +176,15 @@ function rebirth() {
     }
 }
 
+const treeModal = document.getElementById('treeModal');
 const treeMap = document.getElementById('treeMap');
 let isDragging=false, startX, startY;
+
 function openTree() { 
-    document.getElementById('treeModal').style.display='block'; 
+    treeModal.style.display='block'; 
     if(!treeMap.style.left) { treeMap.style.left=(window.innerWidth/2-1500)+'px'; treeMap.style.top=(window.innerHeight/2-1500)+'px'; }
 }
-function closeTree() { document.getElementById('treeModal').style.display='none'; }
+function closeTree() { treeModal.style.display='none'; }
 
 treeMap.onmousedown=(e)=>{ isDragging=true; startX=e.pageX-treeMap.offsetLeft; startY=e.pageY-treeMap.offsetTop; };
 window.onmouseup=()=>isDragging=false;
@@ -225,11 +228,11 @@ setInterval(() => { if(autoLevel > 0){ money += (autoLevel * getTotalClick() * a
 
 function save() {
     const data = { money, coins, rebirths, points, moneyUpgrade, coinUpgrade, moneyUpgradeCost, coinUpgradeCost, autoLevel, autoCost, x3Level, x5Level, superLevel, superCost, boughtNodes, treeX2, treeBonusCoins, critChance, autoMult, secretUnlocked, x5Unlocked };
-    localStorage.setItem('clicker_fixed_v8', JSON.stringify(data));
+    localStorage.setItem('clicker_ultra_final_v9', JSON.stringify(data));
 }
 
 function load() {
-    let s = JSON.parse(localStorage.getItem('clicker_fixed_v8'));
+    let s = JSON.parse(localStorage.getItem('clicker_ultra_final_v9'));
     if(s) { Object.assign(window, s); updateUI(); }
 }
 

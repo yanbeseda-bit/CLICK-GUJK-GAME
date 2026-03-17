@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8" />
-<title>Modern Clicker Evolution FINAL FIXED</title>
+<title>Modern Clicker Ultra Final Save</title>
 <style>
 :root { --bg: #020617; --card: #111827; --accent: #3b82f6; --green: #22c55e; --purple: #a855f7; --gold: #fbbf24; }
 body { font-family: 'Segoe UI', Arial; background: var(--bg); color: white; margin: 0; overflow: hidden; display: flex; height: 100vh; width: 100vw; }
@@ -42,8 +42,8 @@ button:disabled { background: #334155 !important; cursor: default; transform: no
     <div class="card">
         <h3>Удача (Шанс монет)</h3>
         <p>Шанс: <span id="curChanceText">1%</span></p>
-        <p>Цена: <span id="chanceCost">10</span> 🪙</p>
-        <button onclick="buyChanceUpgrade()">Улучшить</button>
+        <p>Цена: <span id="chanceCost">5</span> 🪙</p>
+        <button id="chanceBtn" onclick="buyChanceUpgrade()">Улучшить</button>
     </div>
     <div id="secretShop" style="display: none;">
         <div class="card" style="border: 1px solid var(--gold);">
@@ -118,7 +118,7 @@ button:disabled { background: #334155 !important; cursor: default; transform: no
 </div>
 
 <script>
-// Глобальное состояние игры
+// Глобальный объект состояния - сохраняется целиком
 let state = {
     money: 0, coins: 0, rebirths: 0, points: 0,
     moneyUpgrade: 0, coinUpgrade: 0, moneyUpgradeCost: 30, coinUpgradeCost: 3,
@@ -128,9 +128,8 @@ let state = {
     secretUnlocked: false, x5Unlocked: false, boughtNodes: []
 };
 
-const x3Costs = [7500, 45000, 250000, 1500000, 10000000];
+const x3Costs = [7500, 45000, 280000, 1500000, 9000000];
 const x5Costs = [65000000, 450000000, 1800000000];
-const chanceCostList = [10, 20, 35, 50, 65, 140, 290];
 
 function formatNum(num) {
     if (num >= 1e9) return (num / 1e9).toFixed(2) + 'B';
@@ -161,7 +160,6 @@ function clickMoney(e) {
     updateUI();
 }
 
-// Функции покупок
 function buyMoneyUpgrade() { if(state.money>=state.moneyUpgradeCost){ state.money-=state.moneyUpgradeCost; state.moneyUpgrade++; state.moneyUpgradeCost*=2; updateUI(); } }
 function buyCoinUpgrade() { if(state.coins>=state.coinUpgradeCost){ state.coins-=state.coinUpgradeCost; state.coinUpgrade++; state.coinUpgradeCost*=2; updateUI(); } }
 function buyX3() { if(state.x3Level < x3Costs.length && state.money >= x3Costs[state.x3Level]){ state.money -= x3Costs[state.x3Level]; state.x3Level++; updateUI(); } }
@@ -169,23 +167,22 @@ function buyX5() { if(state.x5Level < x5Costs.length && state.money >= x5Costs[s
 function buyAuto() { if(state.money>=state.autoCost){ state.money-=state.autoCost; state.autoLevel++; state.autoCost*=2; updateUI(); } }
 function buySuperClick() { if(state.coins>=state.superCost){ state.coins-=state.superCost; state.superLevel++; state.superCost*=3; updateUI(); } }
 
+function getChanceCost() {
+    let lvl = state.chanceUpgradeLevel;
+    if(lvl < 6) return (lvl + 1) * 5; // 5, 10, 15, 20, 25, 30
+    return 30 * Math.pow(2, lvl - 5); // Удвоение после 6 уровня
+}
+
 function buyChanceUpgrade() {
+    if(state.coinChanceBase >= 0.30) return;
     let cost = getChanceCost();
     if(state.coins >= cost) {
         state.coins -= cost;
         state.chanceUpgradeLevel++;
-        if(state.chanceUpgradeLevel === 1) state.coinChanceBase = 0.015;
-        else if(state.chanceUpgradeLevel === 2) state.coinChanceBase = 0.02;
-        else if(state.chanceUpgradeLevel === 3) state.coinChanceBase = 0.025;
-        else if(state.chanceUpgradeLevel === 4) state.coinChanceBase = 0.04;
-        else state.coinChanceBase += 0.005;
+        state.coinChanceBase += 0.01; // Всегда +1%
+        if(state.coinChanceBase > 0.30) state.coinChanceBase = 0.30;
         updateUI();
     }
-}
-
-function getChanceCost() {
-    if(state.chanceUpgradeLevel < chanceCostList.length) return chanceCostList[state.chanceUpgradeLevel];
-    return chanceCostList[chanceCostList.length-1] * Math.pow(2, state.chanceUpgradeLevel - (chanceCostList.length-1));
 }
 
 function getRebirthCost() {
@@ -204,7 +201,6 @@ function rebirth() {
     }
 }
 
-// Ветка
 const treeModal = document.getElementById('treeModal');
 const treeMap = document.getElementById('treeMap');
 let isDragging=false, startX, startY;
@@ -238,8 +234,17 @@ function updateUI() {
     document.getElementById('autoCost').innerText = formatNum(state.autoCost);
     document.getElementById('rebInfo').innerText = "Нужно: " + formatNum(getRebirthCost());
     document.getElementById('superCost').innerText = formatNum(state.superCost);
-    document.getElementById('curChanceText').innerText = (state.coinChanceBase * 100).toFixed(1) + '%';
-    document.getElementById('chanceCost').innerText = formatNum(getChanceCost());
+    
+    // UI Шанса
+    let chanceBtn = document.getElementById('chanceBtn');
+    document.getElementById('curChanceText').innerText = (state.coinChanceBase * 100).toFixed(0) + '%';
+    if(state.coinChanceBase >= 0.30) {
+        document.getElementById('chanceCost').innerText = "MAX";
+        chanceBtn.disabled = true;
+    } else {
+        document.getElementById('chanceCost').innerText = formatNum(getChanceCost());
+        chanceBtn.disabled = false;
+    }
 
     document.getElementById('secretShop').style.display = state.secretUnlocked ? 'block' : 'none';
     document.getElementById('x5Shop').style.display = state.x5Unlocked ? 'block' : 'none';
@@ -266,6 +271,7 @@ function updateUI() {
         let n = document.getElementById('node'+id);
         if(n) n.classList.add('bought');
     });
+    save();
 }
 
 function enterPromoCode() {
@@ -273,17 +279,14 @@ function enterPromoCode() {
     if(code === "GUJK1228CV") { state.money += 10000000; alert("Принято! +10M"); updateUI(); }
 }
 
-// Система сохранений
 function save() {
-    localStorage.setItem('clicker_master_save', JSON.stringify(state));
+    localStorage.setItem('clicker_ultra_final_save_v12', JSON.stringify(state));
 }
 
 function load() {
-    let s = localStorage.getItem('clicker_master_save');
+    let s = localStorage.getItem('clicker_ultra_final_save_v12');
     if(s) {
-        let savedState = JSON.parse(s);
-        state = Object.assign(state, savedState);
-        updateUI();
+        state = Object.assign(state, JSON.parse(s));
     }
 }
 
@@ -292,12 +295,11 @@ setInterval(() => {
         state.money += (state.autoLevel * getTotalClick() * state.autoMult) / 2; 
         updateUI(); 
     } 
-    save(); // Автосохранение каждую секунду
 }, 1000);
 
 function resetGame() { 
     if(confirm("Сбросить ВЕСЬ прогресс?")) { 
-        localStorage.removeItem('clicker_master_save'); 
+        localStorage.clear(); 
         location.reload(); 
     } 
 }

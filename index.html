@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8" />
-<title>Modern Clicker Evolution V10</title>
+<title>Modern Clicker Evolution FINAL FIXED</title>
 <style>
 :root { --bg: #020617; --card: #111827; --accent: #3b82f6; --green: #22c55e; --purple: #a855f7; --gold: #fbbf24; }
 body { font-family: 'Segoe UI', Arial; background: var(--bg); color: white; margin: 0; overflow: hidden; display: flex; height: 100vh; width: 100vw; }
@@ -37,7 +37,13 @@ button:disabled { background: #334155 !important; cursor: default; transform: no
     <div class="card">
         <h3>Улучшение клика</h3>
         <p>Цена: <span id="coinUpgradeCost">3</span> 🪙</p>
-        <button id="coinUpBtn" onclick="buyCoinUpgrade()">Купить</button>
+        <button onclick="buyCoinUpgrade()">Купить</button>
+    </div>
+    <div class="card">
+        <h3>Удача (Шанс монет)</h3>
+        <p>Шанс: <span id="curChanceText">1%</span></p>
+        <p>Цена: <span id="chanceCost">10</span> 🪙</p>
+        <button onclick="buyChanceUpgrade()">Улучшить</button>
     </div>
     <div id="secretShop" style="display: none;">
         <div class="card" style="border: 1px solid var(--gold);">
@@ -85,7 +91,7 @@ button:disabled { background: #334155 !important; cursor: default; transform: no
     <div id="x5Shop" style="display: none;">
         <div class="card" style="border: 1px solid var(--accent);">
             <h3>🔥 Супер x5</h3>
-            <p id="x5Info">Цена: 112M</p>
+            <p id="x5Info">Цена: 65M</p>
             <button id="x5Btn" onclick="buyX5()">Купить</button>
         </div>
     </div>
@@ -112,14 +118,20 @@ button:disabled { background: #334155 !important; cursor: default; transform: no
 </div>
 
 <script>
-let money=0, coins=0, rebirths=0, points=0;
-let moneyUpgrade=0, coinUpgrade=0, moneyUpgradeCost=30, coinUpgradeCost=3;
-let autoLevel=0, autoCost=2000, x3Level=0, x3Costs = [7500, 50000, 250000, 1000000, 5000000];
-let x5Level=0, x5Costs = [112000000, 900000000];
-let superLevel=0, superCost=200;
-let treeX2=1, treeBonusCoins=0, critChance=0, autoMult=1, secretUnlocked=false, x5Unlocked=false, boughtNodes=[];
+// Глобальное состояние игры
+let state = {
+    money: 0, coins: 0, rebirths: 0, points: 0,
+    moneyUpgrade: 0, coinUpgrade: 0, moneyUpgradeCost: 30, coinUpgradeCost: 3,
+    autoLevel: 0, autoCost: 2000, x3Level: 0, x5Level: 0, superLevel: 0, superCost: 200,
+    coinChanceBase: 0.01, chanceUpgradeLevel: 0,
+    treeX2: 1, treeBonusCoins: 0, critChance: 0, autoMult: 1, 
+    secretUnlocked: false, x5Unlocked: false, boughtNodes: []
+};
 
-// Форматирование чисел (1K, 1M, 1B)
+const x3Costs = [7500, 45000, 250000, 1500000, 10000000];
+const x5Costs = [65000000, 450000000, 1800000000];
+const chanceCostList = [10, 20, 35, 50, 65, 140, 290];
+
 function formatNum(num) {
     if (num >= 1e9) return (num / 1e9).toFixed(2) + 'B';
     if (num >= 1e6) return (num / 1e6).toFixed(2) + 'M';
@@ -128,16 +140,16 @@ function formatNum(num) {
 }
 
 function getTotalClick() {
-    let base = 1 + moneyUpgrade + coinUpgrade;
-    let multipliers = Math.pow(3, x3Level) * Math.pow(5, x5Level) * Math.pow(2, rebirths) * treeX2 * Math.pow(2, superLevel);
+    let base = 1 + state.moneyUpgrade + state.coinUpgrade;
+    let multipliers = Math.pow(3, state.x3Level) * Math.pow(5, state.x5Level) * Math.pow(2, state.rebirths) * state.treeX2 * Math.pow(2, state.superLevel);
     return base * multipliers;
 }
 
 function clickMoney(e) {
-    let isCrit = Math.random() < critChance;
+    let isCrit = Math.random() < state.critChance;
     let power = getTotalClick() * (isCrit ? 10 : 1);
-    money += power;
-    if(Math.random() < 0.015) coins += (1 + treeBonusCoins);
+    state.money += power;
+    if(Math.random() < state.coinChanceBase) state.coins += (1 + state.treeBonusCoins);
     
     let anim = document.createElement('div');
     anim.className = 'click-anim' + (isCrit ? ' crit' : '');
@@ -149,32 +161,50 @@ function clickMoney(e) {
     updateUI();
 }
 
-function buyMoneyUpgrade() { if(money>=moneyUpgradeCost){ money-=moneyUpgradeCost; moneyUpgrade++; moneyUpgradeCost*=2; updateUI(); } }
-function buyCoinUpgrade() { if(coins>=coinUpgradeCost){ coins-=coinUpgradeCost; coinUpgrade++; coinUpgradeCost*=2; updateUI(); } }
-function buyX3() { if(x3Level < x3Costs.length && money >= x3Costs[x3Level]){ money -= x3Costs[x3Level]; x3Level++; updateUI(); } }
-function buyX5() { if(x5Level < x5Costs.length && money >= x5Costs[x5Level]){ money -= x5Costs[x5Level]; x5Level++; updateUI(); } }
-function buyAuto() { if(money>=autoCost){ money-=autoCost; autoLevel++; autoCost*=2; updateUI(); } }
-function buySuperClick() { if(coins>=superCost){ coins-=superCost; superLevel++; superCost*=3; updateUI(); } }
+// Функции покупок
+function buyMoneyUpgrade() { if(state.money>=state.moneyUpgradeCost){ state.money-=state.moneyUpgradeCost; state.moneyUpgrade++; state.moneyUpgradeCost*=2; updateUI(); } }
+function buyCoinUpgrade() { if(state.coins>=state.coinUpgradeCost){ state.coins-=state.coinUpgradeCost; state.coinUpgrade++; state.coinUpgradeCost*=2; updateUI(); } }
+function buyX3() { if(state.x3Level < x3Costs.length && state.money >= x3Costs[state.x3Level]){ state.money -= x3Costs[state.x3Level]; state.x3Level++; updateUI(); } }
+function buyX5() { if(state.x5Level < x5Costs.length && state.money >= x5Costs[state.x5Level]){ state.money -= x5Costs[state.x5Level]; state.x5Level++; updateUI(); } }
+function buyAuto() { if(state.money>=state.autoCost){ state.money-=state.autoCost; state.autoLevel++; state.autoCost*=2; updateUI(); } }
+function buySuperClick() { if(state.coins>=state.superCost){ state.coins-=state.superCost; state.superLevel++; state.superCost*=3; updateUI(); } }
 
-function enterPromoCode() {
-    let code = prompt("Введите секретный код:");
-    if(code === "GUJK1228CV") { money += 10000000; alert("Принято! +10M"); updateUI(); }
-}
-
-function getRebirthCost() {
-    const rebCosts = [100000, 16000000, 750000000, 14000000000];
-    return rebirths < rebCosts.length ? rebCosts[rebirths] : rebCosts[rebCosts.length-1] * Math.pow(10, rebirths-3);
-}
-
-function rebirth() {
-    if(money >= getRebirthCost()){
-        rebirths++; points++;
-        money=0; coins=0; moneyUpgrade=0; coinUpgrade=0; moneyUpgradeCost=30; coinUpgradeCost=3;
-        autoLevel=0; autoCost=2000; x3Level=0; x5Level=0; superLevel=0; superCost=200;
+function buyChanceUpgrade() {
+    let cost = getChanceCost();
+    if(state.coins >= cost) {
+        state.coins -= cost;
+        state.chanceUpgradeLevel++;
+        if(state.chanceUpgradeLevel === 1) state.coinChanceBase = 0.015;
+        else if(state.chanceUpgradeLevel === 2) state.coinChanceBase = 0.02;
+        else if(state.chanceUpgradeLevel === 3) state.coinChanceBase = 0.025;
+        else if(state.chanceUpgradeLevel === 4) state.coinChanceBase = 0.04;
+        else state.coinChanceBase += 0.005;
         updateUI();
     }
 }
 
+function getChanceCost() {
+    if(state.chanceUpgradeLevel < chanceCostList.length) return chanceCostList[state.chanceUpgradeLevel];
+    return chanceCostList[chanceCostList.length-1] * Math.pow(2, state.chanceUpgradeLevel - (chanceCostList.length-1));
+}
+
+function getRebirthCost() {
+    const rebCosts = [100000, 16000000, 750000000, 14000000000];
+    return state.rebirths < rebCosts.length ? rebCosts[state.rebirths] : rebCosts[rebCosts.length-1] * Math.pow(10, state.rebirths-3);
+}
+
+function rebirth() {
+    if(state.money >= getRebirthCost()){
+        state.rebirths++; state.points++;
+        state.money=0; state.coins=0; state.moneyUpgrade=0; state.coinUpgrade=0;
+        state.moneyUpgradeCost=30; state.coinUpgradeCost=3;
+        state.autoLevel=0; state.autoCost=2000; state.x3Level=0; state.x5Level=0;
+        state.superLevel=0; state.superCost=200;
+        updateUI();
+    }
+}
+
+// Ветка
 const treeModal = document.getElementById('treeModal');
 const treeMap = document.getElementById('treeMap');
 let isDragging=false, startX, startY;
@@ -190,69 +220,89 @@ window.onmouseup=()=>isDragging=false;
 window.onmousemove=(e)=>{ if(isDragging){ treeMap.style.left=(e.pageX-startX)+'px'; treeMap.style.top=(e.pageY-startY)+'px'; } };
 
 function buyTreeNode(id) {
-    if(points >= 1 && !boughtNodes.includes(id)) {
-        if(id === 0) { treeX2=2; treeBonusCoins=1; }
-        if(id === 1) { critChance=0.05; autoMult=3; secretUnlocked=true; }
-        if(id === 2) { x5Unlocked=true; }
-        points -= 1; boughtNodes.push(id); updateUI();
+    if(state.points >= 1 && !state.boughtNodes.includes(id)) {
+        if(id === 0) { state.treeX2=2; state.treeBonusCoins=1; }
+        if(id === 1) { state.critChance=0.05; state.autoMult=3; state.secretUnlocked=true; }
+        if(id === 2) { state.x5Unlocked=true; }
+        state.points -= 1; state.boughtNodes.push(id); updateUI();
     }
 }
 
 function updateUI() {
-    document.getElementById('money').innerText = formatNum(money);
-    document.getElementById('coins').innerText = formatNum(coins);
-    document.getElementById('rebirths').innerText = rebirths;
-    document.getElementById('points').innerText = points;
-    document.getElementById('moneyUpgradeCost').innerText = formatNum(moneyUpgradeCost);
-    document.getElementById('coinUpgradeCost').innerText = formatNum(coinUpgradeCost);
-    document.getElementById('autoCost').innerText = formatNum(autoCost);
+    document.getElementById('money').innerText = formatNum(state.money);
+    document.getElementById('coins').innerText = formatNum(state.coins);
+    document.getElementById('rebirths').innerText = state.rebirths;
+    document.getElementById('points').innerText = state.points;
+    document.getElementById('moneyUpgradeCost').innerText = formatNum(state.moneyUpgradeCost);
+    document.getElementById('coinUpgradeCost').innerText = formatNum(state.coinUpgradeCost);
+    document.getElementById('autoCost').innerText = formatNum(state.autoCost);
     document.getElementById('rebInfo').innerText = "Нужно: " + formatNum(getRebirthCost());
-    document.getElementById('superCost').innerText = formatNum(superCost);
-    document.getElementById('secretShop').style.display = secretUnlocked ? 'block' : 'none';
-    document.getElementById('x5Shop').style.display = x5Unlocked ? 'block' : 'none';
+    document.getElementById('superCost').innerText = formatNum(state.superCost);
+    document.getElementById('curChanceText').innerText = (state.coinChanceBase * 100).toFixed(1) + '%';
+    document.getElementById('chanceCost').innerText = formatNum(getChanceCost());
+
+    document.getElementById('secretShop').style.display = state.secretUnlocked ? 'block' : 'none';
+    document.getElementById('x5Shop').style.display = state.x5Unlocked ? 'block' : 'none';
     
-    // Исправление бага кнопок Максимума
     const x3Btn = document.getElementById('x3Btn');
-    if(x3Level < x3Costs.length) {
-        document.getElementById('x3Info').innerText = "Цена: " + formatNum(x3Costs[x3Level]);
+    if(state.x3Level < x3Costs.length) {
+        document.getElementById('x3Info').innerText = "Цена: " + formatNum(x3Costs[state.x3Level]);
         x3Btn.disabled = false;
-        x3Btn.innerText = "Купить";
     } else {
         document.getElementById('x3Info').innerText = "МАКСИМУМ";
         x3Btn.disabled = true;
-        x3Btn.innerText = "МАКСИМУМ";
     }
     
     const x5Btn = document.getElementById('x5Btn');
-    if(x5Level < x5Costs.length) {
-        document.getElementById('x5Info').innerText = "Цена: " + formatNum(x5Costs[x5Level]);
+    if(state.x5Level < x5Costs.length) {
+        document.getElementById('x5Info').innerText = "Цена: " + formatNum(x5Costs[state.x5Level]);
         x5Btn.disabled = false;
-        x5Btn.innerText = "Купить";
     } else {
         document.getElementById('x5Info').innerText = "МАКСИМУМ";
         x5Btn.disabled = true;
-        x5Btn.innerText = "МАКСИМУМ";
     }
     
-    boughtNodes.forEach(id => document.getElementById('node'+id).classList.add('bought'));
-    save();
+    state.boughtNodes.forEach(id => {
+        let n = document.getElementById('node'+id);
+        if(n) n.classList.add('bought');
+    });
 }
 
-setInterval(() => { if(autoLevel > 0){ money += (autoLevel * getTotalClick() * autoMult) / 2; updateUI(); } }, 1000);
+function enterPromoCode() {
+    let code = prompt("Введите секретный код:");
+    if(code === "GUJK1228CV") { state.money += 10000000; alert("Принято! +10M"); updateUI(); }
+}
 
+// Система сохранений
 function save() {
-    const data = { money, coins, rebirths, points, moneyUpgrade, coinUpgrade, moneyUpgradeCost, coinUpgradeCost, autoLevel, autoCost, x3Level, x5Level, superLevel, superCost, boughtNodes, treeX2, treeBonusCoins, critChance, autoMult, secretUnlocked, x5Unlocked };
-    localStorage.setItem('clicker_final_v10', JSON.stringify(data));
+    localStorage.setItem('clicker_master_save', JSON.stringify(state));
 }
 
 function load() {
-    let s = JSON.parse(localStorage.getItem('clicker_final_v10'));
-    if(s) { Object.assign(window, s); updateUI(); }
+    let s = localStorage.getItem('clicker_master_save');
+    if(s) {
+        let savedState = JSON.parse(s);
+        state = Object.assign(state, savedState);
+        updateUI();
+    }
 }
 
-function resetGame() { if(confirm("Сбросить ВЕСЬ прогресс?")) { localStorage.clear(); location.reload(); } }
+setInterval(() => { 
+    if(state.autoLevel > 0){ 
+        state.money += (state.autoLevel * getTotalClick() * state.autoMult) / 2; 
+        updateUI(); 
+    } 
+    save(); // Автосохранение каждую секунду
+}, 1000);
 
-window.onload = load;
+function resetGame() { 
+    if(confirm("Сбросить ВЕСЬ прогресс?")) { 
+        localStorage.removeItem('clicker_master_save'); 
+        location.reload(); 
+    } 
+}
+
+window.onload = () => { load(); updateUI(); };
 </script>
 </body>
 </html>

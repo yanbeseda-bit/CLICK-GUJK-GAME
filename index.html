@@ -2,26 +2,24 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8" />
-<title>Modern Clicker Ultra FIX FINAL</title>
+<title>Modern Clicker Evolution V10</title>
 <style>
 :root { --bg: #020617; --card: #111827; --accent: #3b82f6; --green: #22c55e; --purple: #a855f7; --gold: #fbbf24; }
 body { font-family: 'Segoe UI', Arial; background: var(--bg); color: white; margin: 0; overflow: hidden; display: flex; height: 100vh; width: 100vw; }
 
-/* Панели */
 .side-panel { width: 280px; background: rgba(17, 24, 39, 0.98); padding: 20px; overflow-y: auto; border-right: 1px solid #1e293b; z-index: 20; position: relative; }
 .side-panel.right { border-right: none; border-left: 1px solid #1e293b; }
 
 .main-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; z-index: 10; }
 .card { background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); text-align: center; border: 1px solid #1e293b; width: 100%; box-sizing: border-box; }
 
-/* КНОПКИ */
 button { background: linear-gradient(135deg, var(--green), #16a34a); border: none; color: white; padding: 12px; border-radius: 10px; cursor: pointer; transition: 0.2s; font-weight: bold; width: 100%; margin-top: 5px; position: relative; z-index: 30; }
 button:hover { transform: scale(1.03); filter: brightness(1.1); }
 button:active { transform: scale(0.95); }
+button:disabled { background: #334155 !important; cursor: default; transform: none !important; opacity: 0.7; }
 
 .bigClick { font-size: 35px; padding: 40px 80px; border-radius: 30px; background: linear-gradient(135deg, #3b82f6, #2563eb); width: auto; box-shadow: 0 0 30px rgba(59, 130, 246, 0.4); margin-top: 10px; }
 
-/* ВЕТКА (ИСПРАВЛЕНО) */
 #treeModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; overflow: hidden; }
 #treeMap { position: absolute; width: 3000px; height: 3000px; cursor: grab; background: radial-gradient(#1e293b 1px, transparent 1px) 0 0 / 50px 50px; }
 .node { position: absolute; width: 180px; height: 180px; background: #1e293b; border: 3px solid #334155; border-radius: 50%; text-align: center; cursor: pointer; transform: translate(-50%, -50%); transition: 0.3s; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px; box-sizing: border-box; font-size: 13px; }
@@ -30,7 +28,6 @@ button:active { transform: scale(0.95); }
 
 .click-anim { position: absolute; pointer-events: none; color: #60a5fa; font-weight: bold; font-size: 26px; animation: fly 0.7s forwards; text-shadow: 0 0 5px black; z-index: 100; }
 @keyframes fly { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-130px); opacity: 0; } }
-.crit { color: var(--gold) !important; font-size: 40px !important; }
 </style>
 </head>
 <body>
@@ -39,8 +36,8 @@ button:active { transform: scale(0.95); }
     <h2 style="text-align:center">🪙 Монеты</h2>
     <div class="card">
         <h3>Улучшение клика</h3>
-        <p>Цена: <span id="coinUpgradeCost">5</span> 🪙</p>
-        <button onclick="buyCoinUpgrade()">Купить</button>
+        <p>Цена: <span id="coinUpgradeCost">3</span> 🪙</p>
+        <button id="coinUpBtn" onclick="buyCoinUpgrade()">Купить</button>
     </div>
     <div id="secretShop" style="display: none;">
         <div class="card" style="border: 1px solid var(--gold);">
@@ -65,7 +62,7 @@ button:active { transform: scale(0.95); }
 
     <div class="card" style="margin-top: 20px; width: 250px;">
         <h3>♻️ Ребирт</h3>
-        <p id="rebInfo">Нужно: 100,000</p>
+        <p id="rebInfo">Нужно: 100K</p>
         <button onclick="rebirth()" style="background: var(--purple);">Сделать</button>
     </div>
 
@@ -82,19 +79,19 @@ button:active { transform: scale(0.95); }
     </div>
     <div class="card">
         <h3>Улучшение x3</h3>
-        <p id="x3Info">Цена: 7,500</p>
+        <p id="x3Info">Цена: 7.5K</p>
         <button id="x3Btn" onclick="buyX3()">Купить</button>
     </div>
     <div id="x5Shop" style="display: none;">
         <div class="card" style="border: 1px solid var(--accent);">
             <h3>🔥 Супер x5</h3>
-            <p id="x5Info">Цена: 12,000,000</p>
+            <p id="x5Info">Цена: 112M</p>
             <button id="x5Btn" onclick="buyX5()">Купить</button>
         </div>
     </div>
     <div class="card">
         <h3>Автокликер</h3>
-        <p>Цена: <span id="autoCost">2000</span></p>
+        <p>Цена: <span id="autoCost">2K</span></p>
         <button onclick="buyAuto()">Купить</button>
     </div>
 </div>
@@ -116,11 +113,19 @@ button:active { transform: scale(0.95); }
 
 <script>
 let money=0, coins=0, rebirths=0, points=0;
-let moneyUpgrade=0, coinUpgrade=0, moneyUpgradeCost=30, coinUpgradeCost=5;
-let autoLevel=0, autoCost=2000, x3Level=0, x3Costs = [7500, 200000, 900000, 7000000, 82000000];
-let x5Level=0, x5Costs = [12000000, 210000000];
+let moneyUpgrade=0, coinUpgrade=0, moneyUpgradeCost=30, coinUpgradeCost=3;
+let autoLevel=0, autoCost=2000, x3Level=0, x3Costs = [7500, 50000, 250000, 1000000, 5000000];
+let x5Level=0, x5Costs = [112000000, 900000000];
 let superLevel=0, superCost=200;
 let treeX2=1, treeBonusCoins=0, critChance=0, autoMult=1, secretUnlocked=false, x5Unlocked=false, boughtNodes=[];
+
+// Форматирование чисел (1K, 1M, 1B)
+function formatNum(num) {
+    if (num >= 1e9) return (num / 1e9).toFixed(2) + 'B';
+    if (num >= 1e6) return (num / 1e6).toFixed(2) + 'M';
+    if (num >= 1e3) return (num / 1e3).toFixed(2) + 'K';
+    return Math.floor(num);
+}
 
 function getTotalClick() {
     let base = 1 + moneyUpgrade + coinUpgrade;
@@ -136,7 +141,7 @@ function clickMoney(e) {
     
     let anim = document.createElement('div');
     anim.className = 'click-anim' + (isCrit ? ' crit' : '');
-    anim.innerText = '+' + Math.floor(power).toLocaleString();
+    anim.innerText = '+' + formatNum(power);
     anim.style.left = e.pageX + 'px';
     anim.style.top = e.pageY + 'px';
     document.body.appendChild(anim);
@@ -146,31 +151,25 @@ function clickMoney(e) {
 
 function buyMoneyUpgrade() { if(money>=moneyUpgradeCost){ money-=moneyUpgradeCost; moneyUpgrade++; moneyUpgradeCost*=2; updateUI(); } }
 function buyCoinUpgrade() { if(coins>=coinUpgradeCost){ coins-=coinUpgradeCost; coinUpgrade++; coinUpgradeCost*=2; updateUI(); } }
-function buyX3() { if(x3Level<5 && money>=x3Costs[x3Level]){ money-=x3Costs[x3Level]; x3Level++; updateUI(); } }
-function buyX5() { if(x5Level<2 && money>=x5Costs[x5Level]){ money-=x5Costs[x5Level]; x5Level++; updateUI(); } }
+function buyX3() { if(x3Level < x3Costs.length && money >= x3Costs[x3Level]){ money -= x3Costs[x3Level]; x3Level++; updateUI(); } }
+function buyX5() { if(x5Level < x5Costs.length && money >= x5Costs[x5Level]){ money -= x5Costs[x5Level]; x5Level++; updateUI(); } }
 function buyAuto() { if(money>=autoCost){ money-=autoCost; autoLevel++; autoCost*=2; updateUI(); } }
 function buySuperClick() { if(coins>=superCost){ coins-=superCost; superLevel++; superCost*=3; updateUI(); } }
 
 function enterPromoCode() {
     let code = prompt("Введите секретный код:");
-    if(code === "GUJK1228CV") {
-        money += 10000000;
-        alert("Код принят! Вы получили 10,000,000 кликов!");
-        updateUI();
-    } else {
-        alert("Неверный код!");
-    }
+    if(code === "GUJK1228CV") { money += 10000000; alert("Принято! +10M"); updateUI(); }
 }
 
 function getRebirthCost() {
-    let costs = [100000, 7000000, 100000000, 6000000000];
-    return rebirths < costs.length ? costs[rebirths] : costs[costs.length-1] * Math.pow(10, rebirths-3);
+    const rebCosts = [100000, 16000000, 750000000, 14000000000];
+    return rebirths < rebCosts.length ? rebCosts[rebirths] : rebCosts[rebCosts.length-1] * Math.pow(10, rebirths-3);
 }
 
 function rebirth() {
     if(money >= getRebirthCost()){
         rebirths++; points++;
-        money=0; coins=0; moneyUpgrade=0; coinUpgrade=0; moneyUpgradeCost=30; coinUpgradeCost=5;
+        money=0; coins=0; moneyUpgrade=0; coinUpgrade=0; moneyUpgradeCost=30; coinUpgradeCost=3;
         autoLevel=0; autoCost=2000; x3Level=0; x5Level=0; superLevel=0; superCost=200;
         updateUI();
     }
@@ -195,30 +194,45 @@ function buyTreeNode(id) {
         if(id === 0) { treeX2=2; treeBonusCoins=1; }
         if(id === 1) { critChance=0.05; autoMult=3; secretUnlocked=true; }
         if(id === 2) { x5Unlocked=true; }
-        points -= 1;
-        boughtNodes.push(id);
-        updateUI();
+        points -= 1; boughtNodes.push(id); updateUI();
     }
 }
 
 function updateUI() {
-    document.getElementById('money').innerText = Math.floor(money).toLocaleString();
-    document.getElementById('coins').innerText = coins;
+    document.getElementById('money').innerText = formatNum(money);
+    document.getElementById('coins').innerText = formatNum(coins);
     document.getElementById('rebirths').innerText = rebirths;
     document.getElementById('points').innerText = points;
-    document.getElementById('moneyUpgradeCost').innerText = moneyUpgradeCost.toLocaleString();
-    document.getElementById('coinUpgradeCost').innerText = coinUpgradeCost;
-    document.getElementById('autoCost').innerText = autoCost.toLocaleString();
-    document.getElementById('rebInfo').innerText = "Нужно: " + getRebirthCost().toLocaleString();
-    document.getElementById('superCost').innerText = superCost.toLocaleString();
+    document.getElementById('moneyUpgradeCost').innerText = formatNum(moneyUpgradeCost);
+    document.getElementById('coinUpgradeCost').innerText = formatNum(coinUpgradeCost);
+    document.getElementById('autoCost').innerText = formatNum(autoCost);
+    document.getElementById('rebInfo').innerText = "Нужно: " + formatNum(getRebirthCost());
+    document.getElementById('superCost').innerText = formatNum(superCost);
     document.getElementById('secretShop').style.display = secretUnlocked ? 'block' : 'none';
     document.getElementById('x5Shop').style.display = x5Unlocked ? 'block' : 'none';
     
-    if(x3Level < 5) document.getElementById('x3Info').innerText = "Цена: " + x3Costs[x3Level].toLocaleString();
-    else { document.getElementById('x3Info').innerText = "МАКСИМУМ"; document.getElementById('x3Btn').disabled = true; }
+    // Исправление бага кнопок Максимума
+    const x3Btn = document.getElementById('x3Btn');
+    if(x3Level < x3Costs.length) {
+        document.getElementById('x3Info').innerText = "Цена: " + formatNum(x3Costs[x3Level]);
+        x3Btn.disabled = false;
+        x3Btn.innerText = "Купить";
+    } else {
+        document.getElementById('x3Info').innerText = "МАКСИМУМ";
+        x3Btn.disabled = true;
+        x3Btn.innerText = "МАКСИМУМ";
+    }
     
-    if(x5Level < 2) document.getElementById('x5Info').innerText = "Цена: " + x5Costs[x5Level].toLocaleString();
-    else { document.getElementById('x5Info').innerText = "МАКСИМУМ"; document.getElementById('x5Btn').disabled = true; }
+    const x5Btn = document.getElementById('x5Btn');
+    if(x5Level < x5Costs.length) {
+        document.getElementById('x5Info').innerText = "Цена: " + formatNum(x5Costs[x5Level]);
+        x5Btn.disabled = false;
+        x5Btn.innerText = "Купить";
+    } else {
+        document.getElementById('x5Info').innerText = "МАКСИМУМ";
+        x5Btn.disabled = true;
+        x5Btn.innerText = "МАКСИМУМ";
+    }
     
     boughtNodes.forEach(id => document.getElementById('node'+id).classList.add('bought'));
     save();
@@ -228,11 +242,11 @@ setInterval(() => { if(autoLevel > 0){ money += (autoLevel * getTotalClick() * a
 
 function save() {
     const data = { money, coins, rebirths, points, moneyUpgrade, coinUpgrade, moneyUpgradeCost, coinUpgradeCost, autoLevel, autoCost, x3Level, x5Level, superLevel, superCost, boughtNodes, treeX2, treeBonusCoins, critChance, autoMult, secretUnlocked, x5Unlocked };
-    localStorage.setItem('clicker_ultra_final_v9', JSON.stringify(data));
+    localStorage.setItem('clicker_final_v10', JSON.stringify(data));
 }
 
 function load() {
-    let s = JSON.parse(localStorage.getItem('clicker_ultra_final_v9'));
+    let s = JSON.parse(localStorage.getItem('clicker_final_v10'));
     if(s) { Object.assign(window, s); updateUI(); }
 }
 

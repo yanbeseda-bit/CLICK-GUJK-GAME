@@ -103,7 +103,7 @@ margin:6px;
 </div>
 
 <div class="card">
-<h3>🤖 Автокликер (моё улучшение)</h3>
+<h3>🤖 Автокликер</h3>
 Цена: <span id="autoCost">2000</span>
 <br>
 <button onclick="buyAuto()">Купить</button>
@@ -111,158 +111,192 @@ margin:6px;
 
 <div class="card">
 <h3>♻️ Ребирт</h3>
-Нужно 100000
+Нужно 100000 денег
 <br>
 <button onclick="rebirth()">Сделать</button>
 </div>
+
+<button style="background:#ef4444; margin-top:30px;" onclick="resetGame()">СБРОСИТЬ ПРОГРЕСС</button>
 </div>
 
 <script>
-let money=0
-let coins=0
-let rebirths=0
-let points=0
-
-let moneyUpgrade=0
-let coinUpgrade=0
-
-let moneyUpgradeCost=50
-let coinUpgradeCost=5
-
-let chanceLevel=0
-let chanceCostList=[500,3000,11000,28000,36000]
-let chanceCost=500
-let coinChance=0.01
-
-let x2Level=0
-let x2Cost=1000
-let x2Multi=1
-
-let autoLevel=0
-let autoCost=2000
+// Основные переменные
+let money=0;
+let coins=0;
+let rebirths=0;
+let points=0;
+let moneyUpgrade=0;
+let coinUpgrade=0;
+let moneyUpgradeCost=50;
+let coinUpgradeCost=5;
+let chanceLevel=0;
+let chanceCostList=[500,3000,11000,28000,36000];
+let chanceCost=500;
+let coinChance=0.01;
+let x2Level=0;
+let x2Cost=1000;
+let x2Multi=1;
+let autoLevel=0;
+let autoCost=2000;
 
 function totalClick(){
-let base = 1 + moneyUpgrade + coinUpgrade
-let reb = Math.pow(2,rebirths)
-return base * reb * x2Multi
+    let base = 1 + moneyUpgrade + coinUpgrade;
+    let reb = Math.pow(2, rebirths);
+    return base * reb * x2Multi;
 }
 
 function clickMoney(){
-money += totalClick()
-if(Math.random() < coinChance) coins++
-update()
+    money += totalClick();
+    if(Math.random() < coinChance) coins++;
+    update();
 }
 
 function buyMoneyUpgrade(){
-if(money>=moneyUpgradeCost){
-money-=moneyUpgradeCost
-moneyUpgrade++
-moneyUpgradeCost*=2
-update()
-}
+    if(money>=moneyUpgradeCost){
+        money-=moneyUpgradeCost;
+        moneyUpgrade++;
+        moneyUpgradeCost*=2;
+        update();
+    }
 }
 
 function buyCoinUpgrade(){
-if(coins>=coinUpgradeCost){
-coins-=coinUpgradeCost
-coinUpgrade++
-coinUpgradeCost*=2
-update()
-}
+    if(coins>=coinUpgradeCost){
+        coins-=coinUpgradeCost;
+        coinUpgrade++;
+        coinUpgradeCost*=2;
+        update();
+    }
 }
 
 function buyChance(){
-if(chanceLevel>=10){
-document.getElementById('chanceMax').innerText="МАКСИМУМ"
-return
-}
-
-if(money>=chanceCost){
-money-=chanceCost
-chanceLevel++
-coinChance+=0.005
-
-if(chanceLevel<5) chanceCost = chanceCostList[chanceLevel]
-else chanceCost = Math.floor(chanceCost*1.5)
-
-update()
-}
+    if(chanceLevel>=10) return;
+    if(money>=chanceCost){
+        money-=chanceCost;
+        chanceLevel++;
+        coinChance+=0.005;
+        if(chanceLevel < 5) chanceCost = chanceCostList[chanceLevel];
+        else chanceCost = Math.floor(chanceCost*1.5);
+        update();
+    }
 }
 
 function buyX2(){
-if(money>=x2Cost){
-money-=x2Cost
-x2Level++
-x2Multi*=2
-if(x2Level==1) x2Cost=6000
-else x2Cost=Math.floor(x2Cost*2.5)
-update()
-}
+    if(money>=x2Cost){
+        money-=x2Cost;
+        x2Level++;
+        x2Multi*=2;
+        if(x2Level==1) x2Cost=6000;
+        else x2Cost=Math.floor(x2Cost*2.5);
+        update();
+    }
 }
 
 function buyAuto(){
-if(money>=autoCost){
-money-=autoCost
-autoLevel++
-autoCost*=2
-update()
-}
+    if(money>=autoCost){
+        money-=autoCost;
+        autoLevel++;
+        autoCost*=2;
+        update();
+    }
 }
 
+// Автокликер работает раз в секунду
 setInterval(()=>{
-money += autoLevel * totalClick()
-update()
-},1000)
+    if(autoLevel > 0){
+        money += autoLevel * totalClick();
+        update();
+    }
+}, 1000);
+
+// Автосохранение раз в 5 секунд
+setInterval(save, 5000);
 
 function rebirth(){
-if(money>=100000){
-rebirths++
-points++
-money=0
-coins=0
-moneyUpgrade=0
-coinUpgrade=0
-moneyUpgradeCost=50
-coinUpgradeCost=5
-x2Level=0
-x2Cost=1000
-x2Multi=1
-autoLevel=0
-autoCost=2000
-chanceLevel=0
-coinChance=0.01
-chanceCost=500
-save()
-update()
-}
+    if(money>=100000){
+        rebirths++;
+        points++;
+        money=0;
+        coins=0;
+        moneyUpgrade=0;
+        coinUpgrade=0;
+        moneyUpgradeCost=50;
+        coinUpgradeCost=5;
+        x2Level=0;
+        x2Cost=1000;
+        x2Multi=1;
+        autoLevel=0;
+        autoCost=2000;
+        chanceLevel=0;
+        coinChance=0.01;
+        chanceCost=500;
+        save();
+        update();
+    }
 }
 
 function save(){
-localStorage.setItem('clickerSave',JSON.stringify({money,coins,rebirths,points,moneyUpgrade,coinUpgrade,moneyUpgradeCost,coinUpgradeCost,chanceLevel,coinChance,chanceCost,x2Level,x2Cost,x2Multi,autoLevel,autoCost}))
+    const gameData = {
+        money, coins, rebirths, points, 
+        moneyUpgrade, coinUpgrade, moneyUpgradeCost, coinUpgradeCost,
+        chanceLevel, coinChance, chanceCost,
+        x2Level, x2Cost, x2Multi,
+        autoLevel, autoCost
+    };
+    localStorage.setItem('clickerSaveV2', JSON.stringify(gameData));
 }
 
 function load(){
-let s = JSON.parse(localStorage.getItem('clickerSave'))
-if(s){Object.assign(window,s)}
+    let savedData = localStorage.getItem('clickerSaveV2');
+    if(savedData){
+        let s = JSON.parse(savedData);
+        money = s.money || 0;
+        coins = s.coins || 0;
+        rebirths = s.rebirths || 0;
+        points = s.points || 0;
+        moneyUpgrade = s.moneyUpgrade || 0;
+        coinUpgrade = s.coinUpgrade || 0;
+        moneyUpgradeCost = s.moneyUpgradeCost || 50;
+        coinUpgradeCost = s.coinUpgradeCost || 5;
+        chanceLevel = s.chanceLevel || 0;
+        coinChance = s.coinChance || 0.01;
+        chanceCost = s.chanceCost || 500;
+        x2Level = s.x2Level || 0;
+        x2Cost = s.x2Cost || 1000;
+        x2Multi = s.x2Multi || 1;
+        autoLevel = s.autoLevel || 0;
+        autoCost = s.autoCost || 2000;
+    }
+}
+
+function resetGame(){
+    if(confirm("Вы уверены, что хотите полностью сбросить прогресс?")){
+        localStorage.removeItem('clickerSaveV2');
+        location.reload();
+    }
 }
 
 function update(){
-document.getElementById('money').innerText=Math.floor(money)
-document.getElementById('coins').innerText=coins
-document.getElementById('rebirths').innerText=rebirths
-document.getElementById('points').innerText=points
-document.getElementById('clickPower').innerText=totalClick()
-document.getElementById('moneyUpgradeCost').innerText=moneyUpgradeCost
-document.getElementById('coinUpgradeCost').innerText=coinUpgradeCost
-document.getElementById('chanceCost').innerText=chanceCost
-document.getElementById('coinChance').innerText=(coinChance*100).toFixed(1)+'%'
-document.getElementById('x2Cost').innerText=x2Cost
-document.getElementById('autoCost').innerText=autoCost
-save()
+    document.getElementById('money').innerText=Math.floor(money);
+    document.getElementById('coins').innerText=coins;
+    document.getElementById('rebirths').innerText=rebirths;
+    document.getElementById('points').innerText=points;
+    document.getElementById('clickPower').innerText=totalClick();
+    document.getElementById('moneyUpgradeCost').innerText=moneyUpgradeCost;
+    document.getElementById('coinUpgradeCost').innerText=coinUpgradeCost;
+    document.getElementById('chanceCost').innerText=chanceCost;
+    document.getElementById('coinChance').innerText=(coinChance*100).toFixed(1)+'%';
+    document.getElementById('x2Cost').innerText=x2Cost;
+    document.getElementById('autoCost').innerText=autoCost;
+    
+    if(chanceLevel >= 10) {
+        document.getElementById('chanceMax').innerText="МАКСИМУМ";
+    }
 }
 
-load()
-update()
+// Запуск игры
+load();
+update();
 </script>
 </body>
 </html>

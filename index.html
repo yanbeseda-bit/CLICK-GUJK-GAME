@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8" />
-<title>Modern Clicker Ultra Final - Trillion Update</title>
+<title>Modern Clicker Ultra Final - Balance Fix</title>
 <style>
 :root { --bg: #020617; --card: #111827; --accent: #3b82f6; --green: #22c55e; --purple: #a855f7; --gold: #fbbf24; --matter: #60a5fa; }
 body { font-family: 'Segoe UI', Arial; background: var(--bg); color: white; margin: 0; overflow: hidden; display: flex; height: 100vh; width: 100vw; }
@@ -53,9 +53,7 @@ line { stroke: #1e293b; stroke-width: 4; transition: 0.5s; opacity: 0; }
     <button onclick="openTree()" style="width: 220px; background: var(--purple); margin-bottom:10px">🕸️ Ветка ребиртов</button>
     <button class="bigClick" onclick="clickMoney(event)">КЛИК!</button>
     <div class="card" style="margin-top: 20px; width: 250px;">
-        <h3>♻️ Ребирт</h3>
-        <p id="rebInfo">Нужно: 100K</p>
-        <button id="rebButton" onclick="rebirth()" style="background: var(--purple);">Сделать (0)</button>
+        <h3>♻️ Ребирт</h3><p id="rebInfo">Нужно: 100K</p><button id="rebButton" onclick="rebirth()" style="background: var(--purple);">Сделать (0)</button>
     </div>
     <button onclick="enterPromoCode()" style="background: #334155; width: auto; font-size: 10px; margin-top: 5px;">Ввести код</button>
     <button onclick="resetGame()" style="background: #ef4444; width: auto; font-size: 10px; margin-top: 20px;">СБРОСИТЬ ВСЁ</button>
@@ -66,7 +64,7 @@ line { stroke: #1e293b; stroke-width: 4; transition: 0.5s; opacity: 0; }
     <div class="card"><h3>Сила клика</h3><p>Цена: <span id="moneyUpgradeCost">30</span></p><button onclick="buyMoneyUpgrade()">Купить</button></div>
     <div class="card"><h3>Улучшение x3</h3><p id="x3Info">Цена: 7.5K</p><button id="x3Btn" onclick="buyX3()">Купить</button></div>
     <div id="x5Shop" style="display: none;"><div class="card" style="border: 1px solid var(--accent);"><h3>🔥 Супер x5</h3><p id="x5Info">Цена: 65M</p><button id="x5Btn" onclick="buyX5()">Купить</button></div></div>
-    <div id="x15Shop" style="display: none;"><div class="card" style="border: 1px solid #f87171;"><h3>🌌 Ультра x1.5</h3><p id="x15Info">Цена: 500M</p><button id="x15Btn" onclick="buyX15()">Купить</button></div></div>
+    <div id="x15Shop" style="display: none;"><div class="card" style="border: 1px solid #f87171;"><h3>🌌 Ультра x1.5</h3><p id="x15Info">Цена: 12B</p><button id="x15Btn" onclick="buyX15()">Купить</button></div></div>
     <div class="card"><h3>Автокликер</h3><p>Цена: <span id="autoCost">2K</span></p><button onclick="buyAuto()">Купить</button></div>
 </div>
 
@@ -82,12 +80,12 @@ let state = {
     matterPerClick: 0.01, matterMultCoins: 1, autoPowerMult: 1, boughtNodes: []
 };
 
+// ТВОИ ЦЕНЫ И ОБНОВЛЕННЫЕ ЗНАЧЕНИЯ X1.5
 const x3Costs = [7500, 95000, 800000, 9000000, 35000000, 450000000, 3000000000];
 const x5Costs = [65000000, 1200000000, 10000000000];
-const x15Costs = [500000000, 3000000000];
+const x15Costs = [12000000000, 450000000000]; // 12B и 450B
 const superCosts = [200, 700, 3000, 7000, 16000, 40000, 140000, 370000, 650000, 1000000];
 const megaCosts = [200, 1000, 2000, 5000, 18000];
-// ОБНОВЛЕННЫЕ ЦЕНЫ РЕБИРТОВ
 const rebirthGoals = [100000, 16000000, 150000000, 820000000, 95000000000, 1100000000000];
 
 let audioCtx = null, musicEnabled = false;
@@ -126,7 +124,7 @@ function updateUI() {
     document.getElementById('coins').innerText = formatNum(state.coins);
     document.getElementById('rebirths').innerText = state.rebirths;
     document.getElementById('points').innerText = state.points;
-    document.getElementById('rebButton').innerText = `Сделать (${state.rebirths})`; // ЦИФРА ВОЗЛЕ РЕБИРТА
+    document.getElementById('rebButton').innerText = `Сделать (${state.rebirths})`;
     
     document.getElementById('moneyUpgradeCost').innerText = formatNum(state.moneyUpgradeCost);
     document.getElementById('coinUpgradeCost').innerText = formatNum(state.coinUpgradeCost);
@@ -165,6 +163,19 @@ function updateUI() {
     localStorage.setItem('click_v12', JSON.stringify(state));
 }
 
+function buyMatterNode(id) {
+    let cost = (id===10) ? 12 : (id===11 ? 14 : 80);
+    if (state.boughtNodes.includes(id)) return;
+    if (!state.boughtNodes.includes(10) && id !== 10) return alert("Сначала Синтез!");
+    if (state.matter >= cost) {
+        state.matter -= cost; state.boughtNodes.push(id);
+        if(id===10) { state.matterMultCoins = 2; state.autoPowerMult = 3; }
+        if(id===11) state.matterPerClick = 0.05;
+        if(id===12) { state.treeX2 *= 2; document.getElementById('x15Shop').style.display = 'block'; }
+        updateUI();
+    } else alert("Недостаточно материи!");
+}
+
 function buyAuto() { if(state.money>=state.autoCost){ state.money-=state.autoCost; state.autoLevel++; state.autoCost=Math.floor(state.autoCost*2.5); updateUI(); } }
 function buyMegaClick() { if (state.megaLevel < 5 && state.coins >= megaCosts[state.megaLevel]) { state.coins -= megaCosts[state.megaLevel]; state.megaLevel++; updateUI(); } }
 function buyMoneyUpgrade() { if(state.money>=state.moneyUpgradeCost){ state.money-=state.moneyUpgradeCost; state.moneyUpgrade++; state.moneyUpgradeCost=Math.floor(state.moneyUpgradeCost*1.5); updateUI(); } }
@@ -175,15 +186,13 @@ function buyX5() { if(state.x5Level < x5Costs.length && state.money >= x5Costs[s
 function buyX15() { if(state.x15Level < x15Costs.length && state.money >= x15Costs[state.x15Level]){ state.money -= x15Costs[state.x15Level]; state.x15Level++; updateUI(); } }
 function buySuperClick() { if(state.coins>=superCosts[state.superLevel] && state.superLevel < 10){ state.coins-=superCosts[state.superLevel]; state.superLevel++; updateUI(); } }
 function buyTreeNode(id) { if (id !== 0 && !state.boughtNodes.includes(0)) return alert("Сначала Центр!"); if (state.points >= 1 && !state.boughtNodes.includes(id)) { state.points--; state.boughtNodes.push(id); if(id===0) { state.treeX2=2; state.treeBonusCoins+=1; } if(id===1) document.getElementById('secretShop').style.display='block'; if(id===2) document.getElementById('x5Shop').style.display='block'; if(id===3) state.treeBonusCoins+=2; updateUI(); }}
-function buyMatterNode(id) { let cost = (id===10) ? 12 : (id===11 ? 14 : 80); if (!state.boughtNodes.includes(10) && id !== 10) return alert("Сначала Синтез!"); if (state.matter >= cost && !state.boughtNodes.includes(id)) { state.matter -= cost; state.boughtNodes.push(id); if(id===10) { state.matterMultCoins = 2; state.autoPowerMult = 3; } if(id===11) state.matterPerClick = 0.05; if(id===12) { state.treeX2 *= 2; document.getElementById('x15Shop').style.display = 'block'; } updateUI(); }}
 function rebirth() { let goal = rebirthGoals[state.rebirths] || 10000000000000; if(state.money >= goal) { state.money = 0; state.moneyUpgrade = 0; state.moneyUpgradeCost = 30; state.autoLevel = 0; state.autoCost = 2000; state.x3Level = 0; state.x5Level = 0; state.rebirths++; state.points++; updateUI(); } }
 function enterPromoCode() { if(prompt("Код:")==="GUJK1228CV") { state.money+=1000000000; updateUI(); } }
-
 function resetGame() { if(confirm("ВЫ УВЕРЕНЫ?")) { isResetting = true; clearInterval(autoInterval); localStorage.clear(); location.reload(); } }
 function openTree() { document.getElementById('treeModal').style.display='block'; }
 function closeTree() { document.getElementById('treeModal').style.display='none'; }
 function toggleMusic() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); musicEnabled = !musicEnabled; document.getElementById('musStatus').innerText = musicEnabled ? "ВКЛ" : "ВЫКЛ"; if (musicEnabled) playTune(); }
-function playTune() { if (!musicEnabled || isResetting) return; let osc = audioCtx.createOscillator(), gain = audioCtx.createGain(); osc.type = 'triangle'; osc.connect(gain); gain.gain.setValueAtTime(0.03, audioCtx.currentTime); osc.start(); osc.stop(audioCtx.currentTime + 3); setTimeout(playTune, 3200); }
+function playTune() { if (!musicEnabled || isResetting) return; let osc = audioCtx.createOscillator(), gain = audioCtx.createGain(); osc.type = 'triangle'; osc.connect(gain); gain.connect(audioCtx.destination); gain.gain.setValueAtTime(0.03, audioCtx.currentTime); osc.start(); osc.stop(audioCtx.currentTime + 3); setTimeout(playTune, 3200); }
 
 autoInterval = setInterval(() => { if(state && state.autoLevel>0 && !isResetting){ state.money += (state.autoLevel * getTotalClick() * 0.1 * state.autoPowerMult); processRewards(); updateUI(); }}, 1000);
 window.onload = function() { let s = localStorage.getItem('click_v12'); if(s) { state = {...state, ...JSON.parse(s)}; updateUI(); } }

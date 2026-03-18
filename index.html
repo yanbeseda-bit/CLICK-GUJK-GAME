@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8" />
-<title>Modern Clicker Ultra Final - Original Balance</title>
+<title>Modern Clicker Ultra Final - Fixed Tree</title>
 <style>
 :root { --bg: #020617; --card: #111827; --accent: #3b82f6; --green: #22c55e; --purple: #a855f7; --gold: #fbbf24; --matter: #60a5fa; }
 body { font-family: 'Segoe UI', Arial; background: var(--bg); color: white; margin: 0; overflow: hidden; display: flex; height: 100vh; width: 100vw; }
@@ -14,14 +14,18 @@ button { background: linear-gradient(135deg, var(--green), #16a34a); border: non
 button:hover { transform: scale(1.03); filter: brightness(1.1); }
 button:active { transform: scale(0.95); }
 .bigClick { font-size: 35px; padding: 40px 80px; border-radius: 30px; background: linear-gradient(135deg, #3b82f6, #2563eb); width: auto; box-shadow: 0 0 30px rgba(59, 130, 246, 0.4); margin-top: 10px; }
-#treeModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 1000; overflow: hidden; }
-#treeMap { position: absolute; width: 3000px; height: 3000px; background: radial-gradient(#1e293b 1px, transparent 1px) 0 0 / 50px 50px; }
-.node { position: absolute; width: 160px; height: 160px; background: #1e293b; border: 3px solid #334155; border-radius: 50%; text-align: center; cursor: pointer; transform: translate(-50%, -50%); transition: 0.3s; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px; box-sizing: border-box; font-size: 12px; z-index: 2; }
+
+/* ИСПРАВЛЕННОЕ ДЕРЕВО */
+#treeModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 1000; }
+#treeViewport { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+#treeContainer { position: relative; width: 800px; height: 600px; } /* Центрированная область */
+.node { position: absolute; width: 140px; height: 140px; background: #1e293b; border: 3px solid #334155; border-radius: 50%; text-align: center; cursor: pointer; transform: translate(-50%, -50%); transition: 0.3s; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px; box-sizing: border-box; font-size: 11px; z-index: 5; }
 .node.bought { background: var(--purple); border-color: #c084fc; box-shadow: 0 0 30px rgba(168, 85, 247, 0.5); }
 .close-tree { position: fixed; top: 20px; right: 20px; width: auto; z-index: 1100; background: #ef4444; }
-svg { position: absolute; width: 100%; height: 100%; pointer-events: none; }
-line { stroke: #1e293b; stroke-width: 5; transition: 0.5s; }
+svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+line { stroke: #1e293b; stroke-width: 4; transition: 0.5s; }
 .active-line { stroke: var(--purple); filter: drop-shadow(0 0 5px var(--purple)); }
+
 .click-anim { position: absolute; pointer-events: none; color: #60a5fa; font-weight: bold; font-size: 26px; animation: fly 0.7s forwards; text-shadow: 0 0 5px black; z-index: 100; }
 @keyframes fly { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-130px); opacity: 0; } }
 </style>
@@ -42,12 +46,7 @@ line { stroke: #1e293b; stroke-width: 5; transition: 0.5s; }
         <button onclick="buyChanceUpgrade()">Улучшить</button>
     </div>
     <div id="secretShop" style="display: none;">
-        <div class="card" style="border: 1px solid var(--gold);">
-            <h3 style="color: var(--gold);">🌟 Супер Клик</h3>
-            <p>Сила x2 за монеты</p>
-            <p>Цена: <span id="superCost">200</span> 🪙</p>
-            <button onclick="buySuperClick()" style="background: var(--gold); color: black;">Улучшить</button>
-        </div>
+        <div class="card" style="border: 1px solid var(--gold);"><h3 style="color:var(--gold);">🌟 Супер Клик</h3><p>Цена: <span id="superCost">200</span></p><button onclick="buySuperClick()" style="background:var(--gold);color:black;">Купить</button></div>
     </div>
 </div>
 
@@ -72,42 +71,28 @@ line { stroke: #1e293b; stroke-width: 5; transition: 0.5s; }
 
 <div class="side-panel right">
     <h2 style="text-align:center">💸 Магазин</h2>
-    <div class="card">
-        <h3>Сила клика</h3>
-        <p>Цена: <span id="moneyUpgradeCost">30</span></p>
-        <button onclick="buyMoneyUpgrade()">Купить</button>
-    </div>
-    <div class="card">
-        <h3>Улучшение x3</h3>
-        <p id="x3Info">Цена: 7.5K</p>
-        <button id="x3Btn" onclick="buyX3()">Купить</button>
-    </div>
+    <div class="card"><h3>Сила клика</h3><p>Цена: <span id="moneyUpgradeCost">30</span></p><button onclick="buyMoneyUpgrade()">Купить</button></div>
+    <div class="card"><h3>Улучшение x3</h3><p id="x3Info">Цена: 7.5K</p><button onclick="buyX3()">Купить</button></div>
     <div id="x5Shop" style="display: none;">
-        <div class="card" style="border: 1px solid var(--accent);">
-            <h3>🔥 Супер x5</h3>
-            <p id="x5Info">Цена: 65M</p>
-            <button id="x5Btn" onclick="buyX5()">Купить</button>
-        </div>
+        <div class="card" style="border: 1px solid var(--accent);"><h3>🔥 Супер x5</h3><p id="x5Info">Цена: 65M</p><button onclick="buyX5()">Купить</button></div>
     </div>
-    <div class="card">
-        <h3>Автокликер</h3>
-        <p>Цена: <span id="autoCost">2K</span></p>
-        <button onclick="buyAuto()">Купить</button>
-    </div>
+    <div class="card"><h3>Автокликер</h3><p>Цена: <span id="autoCost">2K</span></p><button onclick="buyAuto()">Купить</button></div>
 </div>
 
 <div id="treeModal">
     <button class="close-tree" onclick="closeTree()">Закрыть [X]</button>
-    <div id="treeMap">
-        <svg style="width:3000px; height:3000px;">
-            <line id="l1" x1="1500" y1="1500" x2="1750" y2="1500" />
-            <line id="l2" x1="1500" y1="1500" x2="1500" y2="1750" />
-            <line id="l3" x1="1500" y1="1500" x2="1250" y2="1500" />
-        </svg>
-        <div id="node0" class="node" style="left: 1500px; top: 1500px;" onclick="buyTreeNode(0)"><b>Центр</b><br>Сила x2<br>+1 монета<br>1 ⭐</div>
-        <div id="node1" class="node" style="left: 1750px; top: 1500px;" onclick="buyTreeNode(1)"><b>Удача</b><br>Секретный магазин<br>1 ⭐</div>
-        <div id="node2" class="node" style="left: 1500px; top: 1750px;" onclick="buyTreeNode(2)"><b>Мощь</b><br>Открыть x5<br>1 ⭐</div>
-        <div id="node3" class="node" style="left: 1250px; top: 1500px;" onclick="buyTreeNode(3)"><b>Материя</b><br>+0.01 за клик<br>+2 монеты<br>1 ⭐</div>
+    <div id="treeViewport">
+        <div id="treeContainer">
+            <svg style="width:100%; height:100%;">
+                <line id="l1" x1="400" y1="300" x2="600" y2="300" />
+                <line id="l2" x1="400" y1="300" x2="400" y2="500" />
+                <line id="l3" x1="400" y1="300" x2="200" y2="300" />
+            </svg>
+            <div id="node0" class="node" style="left: 400px; top: 300px;" onclick="buyTreeNode(0)"><b>Центр</b><br>Сила x2<br>+1 монета<br>1 ⭐</div>
+            <div id="node1" class="node" style="left: 600px; top: 300px;" onclick="buyTreeNode(1)"><b>Удача</b><br>Магазин монет<br>1 ⭐</div>
+            <div id="node2" class="node" style="left: 400px; top: 500px;" onclick="buyTreeNode(2)"><b>Мощь</b><br>Открыть x5<br>1 ⭐</div>
+            <div id="node3" class="node" style="left: 200px; top: 300px;" onclick="buyTreeNode(3)"><b>Материя</b><br>+0.01 за клик<br>+2 монеты<br>1 ⭐</div>
+        </div>
     </div>
 </div>
 
@@ -119,11 +104,8 @@ let state = {
     coinChanceBase: 0.01, chanceUpgradeLevel: 0, treeX2: 1, treeBonusCoins: 0, boughtNodes: []
 };
 
-// ТВОИ ЦЕНЫ ИЗ ПЕРВОГО КОДА
 const x3Costs = [7500, 50000, 250000, 1500000, 10000000];
 const x5Costs = [65000000, 450000000, 1800000000];
-
-// ТВОЯ ПРОГРЕССИЯ РЕБИРТОВ
 const rebirthGoals = [100000, 16000000, 150000000, 820000000, 2300000000];
 
 function formatNum(num) {
@@ -138,18 +120,23 @@ function getTotalClick() {
 }
 
 function clickMoney(e) {
-    let power = getTotalClick();
-    state.money += power;
+    let p = getTotalClick(); state.money += p;
     if (state.boughtNodes.includes(3)) state.matter += 0.01;
     if (Math.random() < state.coinChanceBase) state.coins += (1 + state.treeBonusCoins);
-    
-    let anim = document.createElement('div');
-    anim.className = 'click-anim';
-    anim.innerText = '+' + formatNum(power);
+    let anim = document.createElement('div'); anim.className = 'click-anim'; anim.innerText = '+' + formatNum(p);
     anim.style.left = e.pageX + 'px'; anim.style.top = e.pageY + 'px';
-    document.body.appendChild(anim);
-    setTimeout(() => anim.remove(), 700);
+    document.body.appendChild(anim); setTimeout(() => anim.remove(), 700);
     updateUI();
+}
+
+function rebirth() {
+    let goal = rebirthGoals[state.rebirths] || rebirthGoals[rebirthGoals.length-1]*2;
+    if(state.money >= goal) {
+        state.money = 0; state.moneyUpgrade = 0; state.moneyUpgradeCost = 30;
+        state.autoLevel = 0; state.autoCost = 2000; state.x3Level = 0; state.x5Level = 0;
+        state.rebirths++; state.points++;
+        updateUI();
+    }
 }
 
 function buyTreeNode(id) {
@@ -160,16 +147,6 @@ function buyTreeNode(id) {
         if(id===1) document.getElementById('secretShop').style.display='block';
         if(id===2) document.getElementById('x5Shop').style.display='block';
         if(id===3) state.treeBonusCoins+=2;
-        updateUI();
-    }
-}
-
-function rebirth() {
-    let goal = rebirthGoals[state.rebirths] || (rebirthGoals[rebirthGoals.length-1] * 2);
-    if(state.money >= goal) {
-        state.money = 0; state.moneyUpgrade = 0; state.moneyUpgradeCost = 30;
-        state.autoLevel = 0; state.autoCost = 2000; state.x3Level = 0; state.x5Level = 0;
-        state.rebirths++; state.points++;
         updateUI();
     }
 }
@@ -190,17 +167,15 @@ function updateUI() {
         document.getElementById('matter').innerText = state.matter.toFixed(2);
     }
     
-    let goal = rebirthGoals[state.rebirths] || (rebirthGoals[rebirthGoals.length-1] * 2);
+    let goal = rebirthGoals[state.rebirths] || rebirthGoals[rebirthGoals.length-1]*2;
     document.getElementById('rebInfo').innerText = "Нужно: " + formatNum(goal);
-    
-    document.getElementById('x3Info').innerText = state.x3Level < x3Costs.length ? "Цена: " + formatNum(x3Costs[state.x3Level]) : "МАКС";
-    document.getElementById('x5Info').innerText = state.x5Level < x5Costs.length ? "Цена: " + formatNum(x5Costs[state.x5Level]) : "МАКС";
-    
+    document.getElementById('x3Info').innerText = state.x3Level < x3Costs.length ? "Цена: " + formatNum(x3Costs[state.x3Level]) : "MAX";
+    document.getElementById('x5Info').innerText = state.x5Level < x5Costs.length ? "Цена: " + formatNum(x5Costs[state.x5Level]) : "MAX";
+
     state.boughtNodes.forEach(id => {
         document.getElementById('node'+id).classList.add('bought');
         if(id===0) { document.getElementById('l1').classList.add('active-line'); document.getElementById('l2').classList.add('active-line'); document.getElementById('l3').classList.add('active-line'); }
     });
-    
     localStorage.setItem('click_v12', JSON.stringify(state));
 }
 

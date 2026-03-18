@@ -3,41 +3,37 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Terraria Clicker - Matter Reborn</title>
+    <title>Modern Clicker Ultra - Full Restore</title>
     <style>
         :root { --bg: #020617; --card: #111827; --accent: #3b82f6; --green: #22c55e; --purple: #a855f7; --gold: #fbbf24; --matter: #60a5fa; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Segoe UI', Arial; background: var(--bg); color: white; margin: 0; display: flex; min-height: 100vh; width: 100vw; overflow-x: hidden; overflow-y: auto; }
+        body { font-family: 'Segoe UI', Arial; background: var(--bg); color: white; margin: 0; display: flex; height: 100vh; width: 100vw; overflow: hidden; }
 
-        .side-panel { width: 280px; background: rgba(17, 24, 39, 0.98); padding: 20px; border-right: 1px solid #1e293b; flex-shrink: 0; }
+        .side-panel { width: 280px; background: rgba(17, 24, 39, 0.98); padding: 20px; overflow-y: auto; border-right: 1px solid #1e293b; z-index: 20; position: relative; }
         .side-panel.right { border-right: none; border-left: 1px solid #1e293b; }
-        .main-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; min-height: 100vh; }
-
-        @media (max-width: 1100px) {
-            body { flex-direction: column; height: auto; }
-            .side-panel { width: 100%; border: none; border-bottom: 2px solid #1e293b; order: 2; }
-            .side-panel.right { order: 3; border-top: 2px solid #1e293b; }
-            .main-area { width: 100%; order: 1; min-height: 100vh; }
-        }
+        .main-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; z-index: 10; }
 
         .card { background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); text-align: center; border: 1px solid #1e293b; width: 100%; }
-        button { background: linear-gradient(135deg, var(--green), #16a34a); border: none; color: white; padding: 12px; border-radius: 10px; cursor: pointer; transition: 0.2s; font-weight: bold; width: 100%; margin-top: 5px; touch-action: manipulation; }
+        button { background: linear-gradient(135deg, var(--green), #16a34a); border: none; color: white; padding: 12px; border-radius: 10px; cursor: pointer; transition: 0.2s; font-weight: bold; width: 100%; margin-top: 5px; }
+        button:hover { transform: scale(1.03); filter: brightness(1.1); }
         button:active { transform: scale(0.95); }
         button:disabled { filter: grayscale(1); opacity: 0.5; cursor: not-allowed; }
 
-        .bigClick { font-size: 35px; padding: 50px 80px; border-radius: 30px; background: linear-gradient(135deg, #3b82f6, #2563eb); width: auto; box-shadow: 0 0 30px rgba(59, 130, 246, 0.4); margin: 20px 0; }
+        .bigClick { font-size: 35px; padding: 40px 80px; border-radius: 30px; background: linear-gradient(135deg, #3b82f6, #2563eb); width: auto; box-shadow: 0 0 30px rgba(59, 130, 246, 0.4); margin: 10px; }
 
-        #treeModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 2000; overflow: auto; }
-        #treeViewport { width: 1200px; height: 800px; position: relative; margin: auto; }
-        .node { position: absolute; width: 130px; height: 130px; background: #1e293b; border: 3px solid #334155; border-radius: 50%; text-align: center; cursor: pointer; transform: translate(-50%, -50%); display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 10px; z-index: 5; transition: 0.3s; }
-        .node.locked { opacity: 0.3; filter: grayscale(1); cursor: not-allowed; }
-        .node.bought { background: var(--purple); border-color: #c084fc; box-shadow: 0 0 20px var(--purple); opacity: 1; filter: none; }
+        #treeModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 1000; }
+        #treeViewport { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+        #treeContainer { position: relative; width: 1200px; height: 800px; }
         
-        svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-        line { stroke: #1e293b; stroke-width: 4; transition: 0.5s; }
-        .active-line { stroke: var(--purple); }
+        .node { position: absolute; width: 140px; height: 140px; background: #1e293b; border: 3px solid #334155; border-radius: 50%; text-align: center; cursor: pointer; transform: translate(-50%, -50%); transition: 0.3s; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 11px; z-index: 5; }
+        .node.locked { opacity: 0.2; filter: grayscale(1); cursor: not-allowed; }
+        .node.bought { background: var(--purple); border-color: #c084fc; box-shadow: 0 0 30px rgba(168, 85, 247, 0.5); opacity: 1; filter: none; }
+        
+        svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+        line { stroke: #1e293b; stroke-width: 4; transition: 0.5s; opacity: 0.3; }
+        .active-line { stroke: var(--purple); opacity: 1; filter: drop-shadow(0 0 5px var(--purple)); }
 
-        .click-anim { position: absolute; pointer-events: none; color: #60a5fa; font-weight: bold; font-size: 26px; animation: fly 0.7s forwards; text-shadow: 0 0 5px black; z-index: 3000; }
+        .click-anim { position: absolute; pointer-events: none; color: #60a5fa; font-weight: bold; font-size: 26px; animation: fly 0.7s forwards; text-shadow: 0 0 5px black; z-index: 100; }
         @keyframes fly { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-130px); opacity: 0; } }
     </style>
 </head>
@@ -46,48 +42,37 @@
 <div class="side-panel">
     <h2 style="text-align:center">🪙 Монеты</h2>
     <div class="card"><h3>Улучшение клика</h3><p>+2 к базе</p><p>Цена: <span id="coinUpgradeCost">3</span> 🪙</p><button onclick="buyCoinUpgrade()">Купить</button></div>
-    <div class="card"><h3 style="color:var(--gold)">⚡ Мега Клик</h3><p>Уровень: <span id="megaLvl">0</span>/5</p><p>Цена: <span id="megaCost">200</span></p><button id="megaBtn" onclick="buyMegaClick()">Улучшить</button></div>
+    <div class="card"><h3 style="color:var(--gold)">⚡ Мега Клик</h3><p>Уровень: <span id="megaLvl">0</span>/5</p><p>Цена: <span id="megaCost">200</span></p><button onclick="buyMegaClick()">Улучшить</button></div>
     
+    <div class="card"><h3>Удача</h3><p>Шанс: <span id="curChanceText">1%</span></p><p>Цена: <span id="chanceCost">5</span></p><button onclick="buyChanceUpgrade()">Улучшить</button></div>
+
     <div id="matterShop" style="display: none;">
-        <h2 style="text-align:center; color:var(--matter)">⚛️ Материя</h2>
-        <div class="card" style="border-color: var(--matter)">
-            <h3>Множитель Материи</h3>
-            <p>Уровень: <span id="matMultLvl">0</span></p>
-            <p>Цена: <span id="matMultCost">5.00</span> ⚛️</p>
-            <button onclick="buyMatterUpgrade('mult')" style="background: var(--matter)">Улучшить</button>
-        </div>
-        <div class="card" style="border-color: var(--matter)">
-            <h3>Квантовый Клик</h3>
-            <p>+100 к базе</p>
-            <p>Цена: <span id="matClickCost">15.00</span> ⚛️</p>
-            <button onclick="buyMatterUpgrade('click')" style="background: var(--matter)">Купить</button>
-        </div>
-        <div class="card" style="border-color: var(--matter)">
-            <h3>Стабильность</h3>
-            <p>+5% шанс монет</p>
-            <p>Цена: <span id="matStabCost">50.00</span> ⚛️</p>
-            <button onclick="buyMatterUpgrade('stab')" style="background: var(--matter)">Купить</button>
-        </div>
+        <h2 style="text-align:center; color:var(--matter); margin-top:30px;">⚛️ Материя</h2>
+        <div class="card" style="border-color: var(--matter)"><h3>Множитель</h3><p>Уровень: <span id="matMultLvl">0</span></p><button onclick="buyMatterUpgrade('mult')" style="background: var(--matter)">Улучшить</button></div>
+        <div class="card" style="border-color: var(--matter)"><h3>Квант-Клик</h3><p>+100 к базе</p><button onclick="buyMatterUpgrade('click')" style="background: var(--matter)">Купить</button></div>
+        <div class="card" style="border-color: var(--matter)"><h3>Стабильность</h3><p>+5% к шансу</p><button onclick="buyMatterUpgrade('stab')" style="background: var(--matter)">Купить</button></div>
     </div>
 </div>
 
 <div class="main-area">
-    <div class="card" style="max-width: 400px;">
+    <div class="card" style="max-width: 400px; background: rgba(17, 24, 39, 0.8);">
         <div>💰 Деньги: <span id="money" style="color:var(--accent)">0</span></div>
         <div>🪙 Монеты: <span id="coins" style="color:var(--gold)">0</span></div>
         <div>🔥 Ребирты: <span id="rebirths" style="color:var(--purple)">0</span></div>
         <div>⭐ Поинты: <span id="points" style="color:var(--green)">0</span></div>
         <div id="matterDisplay" style="display:none; color:var(--matter);">⚛️ Материя: <span id="matter">0</span></div>
     </div>
-    <button onclick="openTree()" style="width: 220px; background: var(--purple);">🕸️ Ветка ребиртов</button>
+    
+    <button onclick="openTree()" style="width: 220px; background: var(--purple); margin-bottom: 15px;">🕸️ Ветка ребиртов</button>
     <button class="bigClick" id="mainButton">КЛИК!</button>
+    
     <div class="card" style="width: 250px;">
-        <h3>♻️ Ребирт</h3><p id="rebInfo">Нужно: 100K</p><button id="rebBtn" onclick="rebirth()" style="background: var(--purple);">Сделать</button>
+        <h3>♻️ Ребирт</h3><p id="rebInfo">Нужно: 100.0K</p>
+        <button id="rebBtn" onclick="rebirth()" style="background: var(--purple);">Сделать</button>
     </div>
-    <div style="display:flex; gap:10px;">
-        <button onclick="enterPromoCode()" style="background:#334155; width:80px;">Код</button>
-        <button onclick="resetGame()" style="background:#ef4444; width:110px;">СБРОСИТЬ</button>
-    </div>
+    
+    <button onclick="enterPromoCode()" style="background:#334155; width:80px; margin-top:10px;">Код</button>
+    <button onclick="resetGame()" style="background:#ef4444; width:120px; margin-top:10px;">СБРОСИТЬ ВСЁ</button>
 </div>
 
 <div class="side-panel right">
@@ -99,17 +84,15 @@
 </div>
 
 <div id="treeModal">
-    <button onclick="closeTree()" style="position:fixed; top:20px; right:20px; width:auto; z-index:2200; background:#ef4444;">ЗАКРЫТЬ [X]</button>
+    <button onclick="closeTree()" style="position:fixed; top:20px; right:20px; width:auto; z-index:1100; background:#ef4444;">ЗАКРЫТЬ [X]</button>
     <div id="treeViewport">
-        <svg style="width:100%; height:100%;">
-            <line id="l1" x1="400" y1="300" x2="600" y2="300" />
-            <line id="l2" x1="400" y1="300" x2="400" y2="500" />
-            <line id="l3" x1="400" y1="300" x2="200" y2="300" />
-        </svg>
-        <div id="node0" class="node" style="left:400px; top:300px;" onclick="buyTreeNode(0)"><b>Центр</b><br>x2 Сила<br>1 ⭐</div>
-        <div id="node1" class="node locked" style="left:600px; top:300px;" onclick="buyTreeNode(1)"><b>Удача</b><br>Магаз монет<br>1 ⭐</div>
-        <div id="node2" class="node locked" style="left:400px; top:500px;" onclick="buyTreeNode(2)"><b>Мощь</b><br>Открыть x5<br>1 ⭐</div>
-        <div id="node3" class="node locked" style="left:200px; top:300px;" onclick="buyTreeNode(3)"><b>Материя</b><br>Магазин Материи<br>1 ⭐</div>
+        <div id="treeContainer">
+            <svg><line id="l1" x1="600" y1="400" x2="850" y2="400" /><line id="l2" x1="600" y1="400" x2="600" y2="650" /><line id="l3" x1="600" y1="400" x2="350" y2="400" /></svg>
+            <div id="node0" class="node" style="left:600px; top:400px;" onclick="buyTreeNode(0)"><b>Центр</b><br>x2 Сила<br>1 ⭐</div>
+            <div id="node1" class="node locked" style="left:850px; top:400px;" onclick="buyTreeNode(1)"><b>Удача</b><br>Магаз монет<br>1 ⭐</div>
+            <div id="node2" class="node locked" style="left:600px; top:650px;" onclick="buyTreeNode(2)"><b>Мощь</b><br>Открыть x5<br>1 ⭐</div>
+            <div id="node3" class="node locked" style="left:350px; top:400px;" onclick="buyTreeNode(3)"><b>Материя</b><br>Магазин Материи<br>1 ⭐</div>
+        </div>
     </div>
 </div>
 
@@ -119,7 +102,7 @@ let state = {
     moneyUpgrade: 0, coinUpgrade: 0, moneyUpgradeCost: 30, coinUpgradeCost: 3, 
     megaLevel: 0, autoLevel: 0, x3Level: 0, x5Level: 0, 
     matMult: 0, matClick: 0, matStab: 0,
-    coinChanceBase: 0.01, treeX2: 1, boughtNodes: [] 
+    coinChanceBase: 0.01, chanceCost: 5, treeX2: 1, boughtNodes: [] 
 };
 
 const x3Costs = [7500, 95000, 800000, 9000000, 35000000, 450000000, 3000000000];
@@ -162,29 +145,29 @@ function updateUI() {
     document.getElementById('rebirths').innerText = state.rebirths;
     document.getElementById('points').innerText = state.points;
     document.getElementById('matter').innerText = state.matter.toFixed(2);
-    
     document.getElementById('moneyUpgradeCost').innerText = formatNum(state.moneyUpgradeCost);
     document.getElementById('coinUpgradeCost').innerText = formatNum(state.coinUpgradeCost);
-    
+    document.getElementById('chanceCost').innerText = formatNum(state.chanceCost);
+    document.getElementById('curChanceText').innerText = ((state.coinChanceBase + state.matStab * 0.05) * 100).toFixed(0) + "%";
+    document.getElementById('matMultLvl').innerText = state.matMult;
+    document.getElementById('autoLvlDisplay').innerText = state.autoLevel;
+    document.getElementById('autoCost').innerText = formatNum(autoCosts[state.autoLevel] || 0);
+
     if(state.x3Level < x3Costs.length) document.getElementById('x3Info').innerText = "Цена: " + formatNum(x3Costs[state.x3Level]);
     else document.getElementById('x3Btn').disabled = true;
 
-    // ВЕТКА РЕБИРТОВ И МАГАЗИНЫ
+    // ОБНОВЛЕНИЕ ПАУТИНЫ
     state.boughtNodes.forEach(id => {
         let n = document.getElementById('node'+id);
         if(n) { n.classList.remove('locked'); n.classList.add('bought'); }
         if(id === 0) [1,2,3].forEach(cid => document.getElementById('node'+cid).classList.remove('locked'));
         if(id === 1) document.getElementById('l1').classList.add('active-line');
         if(id === 2) { document.getElementById('x5Shop').style.display='block'; document.getElementById('l2').classList.add('active-line'); }
-        if(id === 3) { 
-            document.getElementById('matterDisplay').style.display='block'; 
-            document.getElementById('matterShop').style.display='block';
-            document.getElementById('l3').classList.add('active-line'); 
-        }
+        if(id === 3) { document.getElementById('matterDisplay').style.display='block'; document.getElementById('matterShop').style.display='block'; document.getElementById('l3').classList.add('active-line'); }
     });
 
     document.getElementById('rebInfo').innerText = "Нужно: " + formatNum(rebirthGoals[state.rebirths] || 1e12);
-    localStorage.setItem('click_v6_matter', JSON.stringify(state));
+    localStorage.setItem('click_v7_final', JSON.stringify(state));
 }
 
 function buyTreeNode(id) {
@@ -196,27 +179,31 @@ function buyTreeNode(id) {
     }
 }
 
+function buyChanceUpgrade() { if(state.coins >= state.chanceCost && state.coinChanceBase < 0.25) { state.coins -= state.chanceCost; state.coinChanceBase += 0.01; state.chanceCost = Math.floor(state.chanceCost * 2.5); updateUI(); } }
 function buyMatterUpgrade(type) {
     let costs = { mult: 5 + (state.matMult * 10), click: 15 + (state.matClick * 25), stab: 50 + (state.matStab * 100) };
     if (state.matter >= costs[type]) {
         state.matter -= costs[type];
-        state.matMult += (type === 'mult' ? 1 : 0);
-        state.matClick += (type === 'click' ? 1 : 0);
-        state.matStab += (type === 'stab' ? 1 : 0);
+        if(type==='mult') state.matMult++; if(type==='click') state.matClick++; if(type==='stab') state.matStab++;
         updateUI();
     }
 }
 
-// Остальные функции без изменений...
 function buyMoneyUpgrade() { if(state.money>=state.moneyUpgradeCost){ state.money-=state.moneyUpgradeCost; state.moneyUpgrade++; state.moneyUpgradeCost=Math.floor(state.moneyUpgradeCost*1.5); updateUI(); } }
 function buyCoinUpgrade() { if(state.coins>=state.coinUpgradeCost){ state.coins-=state.coinUpgradeCost; state.coinUpgrade++; state.coinUpgradeCost=Math.floor(state.coinUpgradeCost*1.8); updateUI(); } }
+function buyAuto() { if (state.autoLevel < 10 && state.money >= autoCosts[state.autoLevel]) { state.money -= autoCosts[state.autoLevel]; state.autoLevel++; updateUI(); } }
+function buyX3() { if(state.x3Level < x3Costs.length && state.money >= x3Costs[state.x3Level]){ state.money -= x3Costs[state.x3Level]; state.x3Level++; updateUI(); } }
+function buyX5() { if(state.x5Level < 3 && state.money >= 65000000){ state.money -= 65000000; state.x5Level++; updateUI(); } }
+function buyMegaClick() { if (state.megaLevel < 5 && state.coins >= 200) { state.coins -= 200; state.megaLevel++; updateUI(); } }
+
 function rebirth() { if(state.money >= (rebirthGoals[state.rebirths] || 1e12)) { state.money = 0; state.rebirths++; state.points++; state.moneyUpgrade = 0; state.moneyUpgradeCost = 30; state.x3Level = 0; state.autoLevel = 0; updateUI(); } }
 function openTree() { document.getElementById('treeModal').style.display='block'; }
 function closeTree() { document.getElementById('treeModal').style.display='none'; }
 function resetGame() { if(confirm("Сбросить?")) { localStorage.clear(); location.reload(); } }
+function enterPromoCode() { if(prompt("Код:")==="GUJK1228CV") { state.money+=1e9; updateUI(); } }
 
 setInterval(() => { if (state.autoLevel > 0) { state.money += getTotalClick() * autoMultipliers[state.autoLevel-1]; updateUI(); } }, 1000);
-window.onload = () => { let s = localStorage.getItem('click_v6_matter'); if(s) { state = Object.assign(state, JSON.parse(s)); updateUI(); } }
+window.onload = () => { let s = localStorage.getItem('click_v7_final'); if(s) { state = Object.assign(state, JSON.parse(s)); updateUI(); } }
 </script>
 </body>
 </html>

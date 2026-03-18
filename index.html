@@ -3,55 +3,30 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Terraria Clicker - Stable Edition</title>
+    <title>Terraria Clicker - Bugfix Edition</title>
     <style>
         :root { --bg: #020617; --card: #111827; --accent: #3b82f6; --green: #22c55e; --purple: #a855f7; --gold: #fbbf24; --matter: #60a5fa; }
-        
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Segoe UI', Arial; background: var(--bg); color: white; margin: 0; display: flex; min-height: 100vh; width: 100vw; overflow-x: hidden; overflow-y: auto; }
 
-        body { 
-            font-family: 'Segoe UI', Arial; background: var(--bg); color: white; margin: 0; 
-            display: flex; min-height: 100vh; width: 100vw; 
-            overflow-x: hidden; overflow-y: auto; /* Разрешаем обычный скролл */
-        }
-
-        /* --- ПК ВЕРСИЯ (Три колонки) --- */
-        .side-panel { 
-            width: 280px; background: rgba(17, 24, 39, 0.98); padding: 20px; 
-            border-right: 1px solid #1e293b; flex-shrink: 0;
-        }
+        .side-panel { width: 280px; background: rgba(17, 24, 39, 0.98); padding: 20px; border-right: 1px solid #1e293b; flex-shrink: 0; }
         .side-panel.right { border-right: none; border-left: 1px solid #1e293b; }
+        .main-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; min-height: 100vh; }
 
-        .main-area { 
-            flex: 1; display: flex; flex-direction: column; align-items: center; 
-            justify-content: center; padding: 20px; min-height: 100vh;
-        }
-
-        /* --- МОБИЛЬНАЯ ВЕРСИЯ (Все в один столбик) --- */
         @media (max-width: 1100px) {
-            body { flex-direction: column; overflow-y: auto; height: auto; }
-            .side-panel { width: 100%; border: none; border-bottom: 2px solid #1e293b; order: 2; height: auto; }
-            .side-panel.right { order: 3; border-bottom: none; border-top: 2px solid #1e293b; }
+            body { flex-direction: column; height: auto; }
+            .side-panel { width: 100%; border: none; border-bottom: 2px solid #1e293b; order: 2; }
+            .side-panel.right { order: 3; border-top: 2px solid #1e293b; }
             .main-area { width: 100%; order: 1; min-height: 100vh; }
         }
 
         .card { background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); text-align: center; border: 1px solid #1e293b; width: 100%; }
-        
-        button { 
-            background: linear-gradient(135deg, var(--green), #16a34a); border: none; color: white; 
-            padding: 12px; border-radius: 10px; cursor: pointer; transition: 0.2s; 
-            font-weight: bold; width: 100%; margin-top: 5px; touch-action: manipulation;
-        }
+        button { background: linear-gradient(135deg, var(--green), #16a34a); border: none; color: white; padding: 12px; border-radius: 10px; cursor: pointer; transition: 0.2s; font-weight: bold; width: 100%; margin-top: 5px; touch-action: manipulation; }
         button:active { transform: scale(0.95); }
         button:disabled { filter: grayscale(1); opacity: 0.5; }
 
-        .bigClick { 
-            font-size: 35px; padding: 50px 80px; border-radius: 30px; 
-            background: linear-gradient(135deg, #3b82f6, #2563eb); width: auto; 
-            box-shadow: 0 0 30px rgba(59, 130, 246, 0.4); margin: 20px 0; touch-action: manipulation;
-        }
+        .bigClick { font-size: 35px; padding: 50px 80px; border-radius: 30px; background: linear-gradient(135deg, #3b82f6, #2563eb); width: auto; box-shadow: 0 0 30px rgba(59, 130, 246, 0.4); margin: 20px 0; }
 
-        /* Дерево ребиртов */
         #treeModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 2000; overflow: auto; }
         #treeViewport { width: 1200px; height: 800px; position: relative; margin: auto; }
         .node { position: absolute; width: 130px; height: 130px; background: #1e293b; border: 3px solid #334155; border-radius: 50%; text-align: center; cursor: pointer; transform: translate(-50%, -50%); display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 10px; z-index: 5; }
@@ -60,7 +35,6 @@
         svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
         line { stroke: #1e293b; stroke-width: 4; opacity: 0.3; }
         .active-line { stroke: var(--purple); opacity: 1; }
-
         .click-anim { position: absolute; pointer-events: none; color: #60a5fa; font-weight: bold; font-size: 26px; animation: fly 0.7s forwards; text-shadow: 0 0 5px black; z-index: 3000; }
         @keyframes fly { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-130px); opacity: 0; } }
     </style>
@@ -72,7 +46,7 @@
     <div class="card"><h3>Улучшение клика</h3><p>+2 к базе</p><p>Цена: <span id="coinUpgradeCost">3</span> 🪙</p><button onclick="buyCoinUpgrade()">Купить</button></div>
     <div class="card"><h3 style="color:var(--gold)">⚡ Мега Клик</h3><p>Уровень: <span id="megaLvl">0</span>/5</p><p>Цена: <span id="megaCost">200</span></p><button id="megaBtn" onclick="buyMegaClick()">Улучшить</button></div>
     <div class="card"><h3>Удача</h3><p>Шанс: <span id="curChanceText">1%</span></p><p>Цена: <span id="chanceCost">5</span></p><button id="chanceBtn" onclick="buyChanceUpgrade()">Улучшить</button></div>
-    <div id="secretShop" style="display: none;"><div class="card" style="border: 1px solid var(--gold);"><h3 style="color:var(--gold);">🌟 Супер Клик</h3><p>Цена: <span id="superCost">200</span></p><button onclick="buySuperClick()">Купить</button></div></div>
+    <div id="secretShop" style="display: none;"><div class="card" style="border: 1px solid var(--gold);"><h3 style="color:var(--gold);">🌟 Супер Клик</h3><p>Уровень: <span id="superLvl">0</span>/10</p><p>Цена: <span id="superCost">200</span></p><button id="superBtn" onclick="buySuperClick()">Купить</button></div></div>
     <button onclick="toggleMusic()" style="background:#334155; margin-bottom: 20px;">🎵 Музыка: <span id="musStatus">ВЫКЛ</span></button>
 </div>
 
@@ -87,7 +61,7 @@
     <button onclick="openTree()" style="width: 220px; background: var(--purple);">🕸️ Ветка ребиртов</button>
     <button class="bigClick" id="mainButton">КЛИК!</button>
     <div class="card" style="width: 250px;">
-        <h3>♻️ Ребирт</h3><p id="rebInfo">Нужно: 100K</p><button onclick="rebirth()" style="background: var(--purple);">Сделать</button>
+        <h3>♻️ Ребирт</h3><p id="rebInfo">Нужно: 100K</p><button id="rebBtn" onclick="rebirth()" style="background: var(--purple);">Сделать</button>
     </div>
     <div style="display:flex; gap:10px;">
         <button onclick="enterPromoCode()" style="background:#334155; width:80px;">Код</button>
@@ -98,8 +72,8 @@
 <div class="side-panel right">
     <h2 style="text-align:center">💸 Магазин</h2>
     <div class="card"><h3>Сила клика</h3><p>Цена: <span id="moneyUpgradeCost">30</span></p><button onclick="buyMoneyUpgrade()">Купить</button></div>
-    <div class="card"><h3>Улучшение x3</h3><p id="x3Info">Цена: 7.5K</p><button onclick="buyX3()">Купить</button></div>
-    <div id="x5Shop" style="display: none;"><div class="card"><h3>🔥 Супер x5</h3><p id="x5Info">Цена: 65M</p><button onclick="buyX5()">Купить</button></div></div>
+    <div class="card"><h3>Улучшение x3</h3><p id="x3Info">Цена: 7.5K</p><button id="x3Btn" onclick="buyX3()">Купить</button></div>
+    <div id="x5Shop" style="display: none;"><div class="card"><h3>🔥 Супер x5</h3><p id="x5Info">Цена: 65M</p><button id="x5Btn" onclick="buyX5()">Купить</button></div></div>
     <div class="card"><h3>Автокликер</h3><p>Уровень: <span id="autoLvlDisplay">0</span>/10</p><p>Цена: <span id="autoCost">2K</span></p><button id="autoBtn" onclick="buyAuto()">Купить</button></div>
 </div>
 
@@ -115,20 +89,24 @@
 </div>
 
 <script>
-let state = { money: 0, coins: 0, rebirths: 0, points: 0, matter: 0, moneyUpgrade: 0, coinUpgrade: 0, moneyUpgradeCost: 30, coinUpgradeCost: 3, megaLevel: 0, autoLevel: 0, x3Level: 0, x5Level: 0, superLevel: 0, coinChanceBase: 0.01, treeX2: 1, treeBonusCoins: 0, boughtNodes: [] };
+let state = { money: 0, coins: 0, rebirths: 0, points: 0, matter: 0, moneyUpgrade: 0, coinUpgrade: 0, moneyUpgradeCost: 30, coinUpgradeCost: 3, megaLevel: 0, autoLevel: 0, x3Level: 0, x5Level: 0, superLevel: 0, coinChanceBase: 0.01, chanceCost: 5, treeX2: 1, treeBonusCoins: 0, boughtNodes: [] };
 
 const autoCosts = [2000, 125000, 480000, 3000000, 22000000, 720000000, 4000000000, 16000000000, 420000000000, 9000000000000];
 const autoMultipliers = [0.5, 1, 1.5, 2, 3, 4, 5, 7, 10, 14];
 const rebirthGoals = [100000, 16000000, 150000000, 820000000, 95000000000, 1100000000000];
+const x3Costs = [7500, 95000, 800000, 9000000, 35000000, 450000000, 3000000000];
+const x5Costs = [65000000, 1200000000, 10000000000];
+const megaCosts = [200, 1000, 2000, 5000, 18000];
+const superCosts = [200, 700, 3000, 7000, 16000, 40000, 140000, 370000, 650000, 1000000];
 
-let bgMusic = new Audio("https://pixabay.com/music/download/adventure-153744.mp3?attachment"); // Стабильная ссылка
+let bgMusic = new Audio("https://pixabay.com/music/download/adventure-153744.mp3?attachment");
 bgMusic.loop = true;
 let musicEnabled = false;
 
 function toggleMusic() {
     musicEnabled = !musicEnabled;
     let s = document.getElementById('musStatus');
-    if(musicEnabled) { bgMusic.play().then(() => s.innerText = "ВКЛ").catch(() => { musicEnabled = false; s.innerText = "КЛИКНИ ЭКРАН"; }); }
+    if(musicEnabled) { bgMusic.play().then(() => s.innerText = "ВКЛ").catch(() => { musicEnabled = false; s.innerText = "ОШИБКА"; }); }
     else { bgMusic.pause(); s.innerText = "ВЫКЛ"; }
 }
 
@@ -153,7 +131,6 @@ function clickMoney(e) {
     let p = getTotalClick(); state.money += p;
     if (Math.random() < state.coinChanceBase) state.coins += (1 + state.treeBonusCoins);
     if (state.boughtNodes.includes(3)) state.matter += 0.01;
-    
     let anim = document.createElement('div'); anim.className = 'click-anim'; anim.innerText = '+' + formatNum(p);
     anim.style.left = e.clientX + 'px'; anim.style.top = e.clientY + 'px';
     document.body.appendChild(anim); setTimeout(() => anim.remove(), 700);
@@ -167,34 +144,102 @@ function updateUI() {
     document.getElementById('points').innerText = state.points;
     document.getElementById('moneyUpgradeCost').innerText = formatNum(state.moneyUpgradeCost);
     document.getElementById('coinUpgradeCost').innerText = formatNum(state.coinUpgradeCost);
-    
+    document.getElementById('chanceCost').innerText = formatNum(state.chanceCost);
+    document.getElementById('curChanceText').innerText = (state.coinChanceBase * 100).toFixed(0) + "%";
+    document.getElementById('matter').innerText = state.matter.toFixed(2);
+
+    if(state.x3Level < x3Costs.length) {
+        document.getElementById('x3Info').innerText = "Цена: " + formatNum(x3Costs[state.x3Level]);
+        document.getElementById('x3Btn').disabled = false;
+    } else {
+        document.getElementById('x3Info').innerText = "Цена: MAX";
+        document.getElementById('x3Btn').disabled = true;
+    }
+
+    if(state.x5Level < x5Costs.length) {
+        document.getElementById('x5Info').innerText = "Цена: " + formatNum(x5Costs[state.x5Level]);
+        document.getElementById('x5Btn').disabled = false;
+    } else {
+        document.getElementById('x5Info').innerText = "Цена: MAX";
+        document.getElementById('x5Btn').disabled = true;
+    }
+
     document.getElementById('autoLvlDisplay').innerText = state.autoLevel;
-    if (state.autoLevel < 10) document.getElementById('autoCost').innerText = formatNum(autoCosts[state.autoLevel]);
-    else { document.getElementById('autoCost').innerText = "MAX"; document.getElementById('autoBtn').disabled = true; }
+    if (state.autoLevel < 10) {
+        document.getElementById('autoCost').innerText = formatNum(autoCosts[state.autoLevel]);
+        document.getElementById('autoBtn').disabled = false;
+    } else {
+        document.getElementById('autoCost').innerText = "MAX";
+        document.getElementById('autoBtn').disabled = true;
+    }
+
+    document.getElementById('megaLvl').innerText = state.megaLevel;
+    if(state.megaLevel < 5) {
+        document.getElementById('megaCost').innerText = formatNum(megaCosts[state.megaLevel]);
+        document.getElementById('megaBtn').disabled = false;
+    } else {
+        document.getElementById('megaCost').innerText = "MAX";
+        document.getElementById('megaBtn').disabled = true;
+    }
+
+    document.getElementById('superLvl').innerText = state.superLevel;
+    if(state.superLevel < 10) document.getElementById('superCost').innerText = formatNum(superCosts[state.superLevel]);
+    else document.getElementById('superCost').innerText = "MAX";
 
     state.boughtNodes.forEach(id => {
         let n = document.getElementById('node'+id); if(n) n.classList.add('bought');
         if(id===0) { document.getElementById('l1').classList.add('active-line'); document.getElementById('l2').classList.add('active-line'); document.getElementById('l3').classList.add('active-line'); }
+        if(id===1) document.getElementById('secretShop').style.display='block';
+        if(id===2) document.getElementById('x5Shop').style.display='block';
+        if(id===3) document.getElementById('matterDisplay').style.display='block';
     });
 
     let goal = rebirthGoals[state.rebirths] || 1e12;
     document.getElementById('rebInfo').innerText = "Нужно: " + formatNum(goal);
-    localStorage.setItem('click_vfinal', JSON.stringify(state));
+    localStorage.setItem('click_final_v4', JSON.stringify(state));
 }
 
 function buyMoneyUpgrade() { if(state.money>=state.moneyUpgradeCost){ state.money-=state.moneyUpgradeCost; state.moneyUpgrade++; state.moneyUpgradeCost=Math.floor(state.moneyUpgradeCost*1.5); updateUI(); } }
 function buyCoinUpgrade() { if(state.coins>=state.coinUpgradeCost){ state.coins-=state.coinUpgradeCost; state.coinUpgrade++; state.coinUpgradeCost=Math.floor(state.coinUpgradeCost*1.8); updateUI(); } }
+function buyChanceUpgrade() { if(state.coins>=state.chanceCost && state.coinChanceBase < 0.25){ state.coins-=state.chanceCost; state.coinChanceBase+=0.01; state.chanceCost=Math.floor(state.chanceCost*2.5); updateUI(); } }
 function buyAuto() { if (state.autoLevel < 10 && state.money >= autoCosts[state.autoLevel]) { state.money -= autoCosts[state.autoLevel]; state.autoLevel++; updateUI(); } }
-function buyX3() { if(state.money >= 7500){ state.money -= 7500; state.x3Level++; updateUI(); } }
-function buyTreeNode(id) { if (state.points >= 1 && !state.boughtNodes.includes(id)) { state.points--; state.boughtNodes.push(id); if(id===0) state.treeX2=2; if(id===1) document.getElementById('secretShop').style.display='block'; if(id===2) document.getElementById('x5Shop').style.display='block'; if(id===3) document.getElementById('matterDisplay').style.display='block'; updateUI(); } }
-function rebirth() { let goal = rebirthGoals[state.rebirths] || 100000; if(state.money >= goal) { state.money = 0; state.rebirths++; state.points++; updateUI(); } }
+function buyX3() { if(state.x3Level < x3Costs.length && state.money >= x3Costs[state.x3Level]){ state.money -= x3Costs[state.x3Level]; state.x3Level++; updateUI(); } }
+function buyX5() { if(state.x5Level < x5Costs.length && state.money >= x5Costs[state.x5Level]){ state.money -= x5Costs[state.x5Level]; state.x5Level++; updateUI(); } }
+function buyMegaClick() { if (state.megaLevel < 5 && state.coins >= megaCosts[state.megaLevel]) { state.coins -= megaCosts[state.megaLevel]; state.megaLevel++; updateUI(); } }
+function buySuperClick() { if(state.coins >= superCosts[state.superLevel] && state.superLevel < 10) { state.coins -= superCosts[state.superLevel]; state.superLevel++; updateUI(); } }
+function buyTreeNode(id) { if (state.points >= 1 && !state.boughtNodes.includes(id)) { state.points--; state.boughtNodes.push(id); if(id===0) state.treeX2=2; updateUI(); } }
+
+function rebirth() { 
+    let goal = rebirthGoals[state.rebirths] || 100000; 
+    if(state.money >= goal) { 
+        state.money = 0; 
+        state.rebirths++; 
+        state.points++; 
+        // СБРОС МАГАЗИНА ДЛЯ НОВОГО ЦИКЛА
+        state.moneyUpgrade = 0;
+        state.moneyUpgradeCost = 30;
+        state.x3Level = 0;
+        state.x5Level = 0;
+        state.autoLevel = 0;
+        updateUI(); 
+    } 
+}
+
 function openTree() { document.getElementById('treeModal').style.display='block'; }
 function closeTree() { document.getElementById('treeModal').style.display='none'; }
 function resetGame() { if(confirm("Сбросить?")) { localStorage.clear(); location.reload(); } }
 function enterPromoCode() { if(prompt("Код:")==="GUJK1228CV") { state.money+=1e9; updateUI(); } }
 
-setInterval(() => { if (state.autoLevel > 0) { state.money += getTotalClick() * autoMultipliers[state.autoLevel-1]; updateUI(); } }, 1000);
-window.onload = () => { let s = localStorage.getItem('click_vfinal'); if(s) { state = JSON.parse(s); updateUI(); } }
+// ФИКС АВТОКЛИКЕРА: Берем getTotalClick() прямо в интервале
+setInterval(() => { 
+    if (state.autoLevel > 0) { 
+        let power = getTotalClick() * autoMultipliers[state.autoLevel-1];
+        state.money += power; 
+        updateUI(); 
+    } 
+}, 1000);
+
+window.onload = () => { let s = localStorage.getItem('click_final_v4'); if(s) { state = Object.assign(state, JSON.parse(s)); updateUI(); } }
 </script>
 </body>
 </html>

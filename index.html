@@ -2,19 +2,26 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8" />
-    <title>Modern Clicker Ultra Final - Balance Fix</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Modern Clicker Ultra Final - Mobile Fixed</title>
     <style>
         :root { --bg: #020617; --card: #111827; --accent: #3b82f6; --green: #22c55e; --purple: #a855f7; --gold: #fbbf24; --matter: #60a5fa; }
-        body { font-family: 'Segoe UI', Arial; background: var(--bg); color: white; margin: 0; overflow: hidden; display: flex; height: 100vh; width: 100vw; }
+        body { 
+            font-family: 'Segoe UI', Arial; background: var(--bg); color: white; margin: 0; 
+            overflow: hidden; display: flex; height: 100vh; width: 100vw;
+            touch-action: manipulation; /* ФИКС ЗУМА */
+            -webkit-tap-highlight-color: transparent;
+            user-select: none; /* ЗАПРЕТ ВЫДЕЛЕНИЯ ТЕКСТА */
+        }
         .side-panel { width: 280px; background: rgba(17, 24, 39, 0.98); padding: 20px; overflow-y: auto; border-right: 1px solid #1e293b; z-index: 20; position: relative; }
         .side-panel.right { border-right: none; border-left: 1px solid #1e293b; }
         .main-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; z-index: 10; }
         .card { background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); text-align: center; border: 1px solid #1e293b; width: 100%; box-sizing: border-box; }
-        button { background: linear-gradient(135deg, var(--green), #16a34a); border: none; color: white; padding: 12px; border-radius: 10px; cursor: pointer; transition: 0.2s; font-weight: bold; width: 100%; margin-top: 5px; position: relative; z-index: 30; }
+        button { background: linear-gradient(135deg, var(--green), #16a34a); border: none; color: white; padding: 12px; border-radius: 10px; cursor: pointer; transition: 0.2s; font-weight: bold; width: 100%; margin-top: 5px; position: relative; z-index: 30; touch-action: manipulation; }
         button:hover { transform: scale(1.03); filter: brightness(1.1); }
         button:active { transform: scale(0.95); }
         button:disabled { filter: grayscale(1); opacity: 0.5; cursor: not-allowed; }
-        .bigClick { font-size: 35px; padding: 40px 80px; border-radius: 30px; background: linear-gradient(135deg, #3b82f6, #2563eb); width: auto; box-shadow: 0 0 30px rgba(59, 130, 246, 0.4); margin-top: 10px; }
+        .bigClick { font-size: 35px; padding: 40px 80px; border-radius: 30px; background: linear-gradient(135deg, #3b82f6, #2563eb); width: auto; box-shadow: 0 0 30px rgba(59, 130, 246, 0.4); margin-top: 10px; touch-action: none; }
         #treeModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 1000; }
         #treeViewport { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
         #treeContainer { position: relative; width: 1200px; height: 800px; }
@@ -80,10 +87,8 @@ let state = {
     matterPerClick: 0.01, matterMultCoins: 1, autoPowerMult: 1, boughtNodes: []
 };
 
-// ТВОИ НОВЫЕ ЦЕНЫ И МНОЖИТЕЛИ
 const autoCosts = [2000, 125000, 480000, 3000000, 22000000, 720000000, 4000000000, 16000000000, 420000000000, 9000000000000];
 const autoMultipliers = [0.5, 1, 1.5, 2, 3, 4, 5, 7, 10, 14];
-
 const x3Costs = [7500, 95000, 800000, 9000000, 35000000, 450000000, 3000000000];
 const x5Costs = [65000000, 1200000000, 10000000000];
 const x15Costs = [12000000000, 450000000000];
@@ -128,18 +133,12 @@ function updateUI() {
     document.getElementById('rebirths').innerText = state.rebirths;
     document.getElementById('points').innerText = state.points;
     document.getElementById('rebButton').innerText = `Сделать (${state.rebirths})`;
-    
     document.getElementById('moneyUpgradeCost').innerText = formatNum(state.moneyUpgradeCost);
     document.getElementById('coinUpgradeCost').innerText = formatNum(state.coinUpgradeCost);
     
-    // UI Автокликера
     document.getElementById('autoLvlDisplay').innerText = state.autoLevel;
-    if (state.autoLevel < autoCosts.length) {
-        document.getElementById('autoCost').innerText = formatNum(autoCosts[state.autoLevel]);
-    } else {
-        document.getElementById('autoCost').innerText = "MAX";
-        document.getElementById('autoBtn').disabled = true;
-    }
+    if (state.autoLevel < autoCosts.length) { document.getElementById('autoCost').innerText = formatNum(autoCosts[state.autoLevel]); } 
+    else { document.getElementById('autoCost').innerText = "MAX"; document.getElementById('autoBtn').disabled = true; }
 
     document.getElementById('megaLvl').innerText = state.megaLevel;
     if(state.megaLevel < 5) document.getElementById('megaCost').innerText = formatNum(megaCosts[state.megaLevel]);
@@ -175,17 +174,7 @@ function updateUI() {
     localStorage.setItem('click_v12', JSON.stringify(state));
 }
 
-function buyAuto() {
-    if (state.autoLevel < autoCosts.length) {
-        let cost = autoCosts[state.autoLevel];
-        if (state.money >= cost) {
-            state.money -= cost;
-            state.autoLevel++;
-            updateUI();
-        } else alert("Недостаточно денег!");
-    }
-}
-
+function buyAuto() { if (state.autoLevel < autoCosts.length) { let cost = autoCosts[state.autoLevel]; if (state.money >= cost) { state.money -= cost; state.autoLevel++; updateUI(); } else alert("Недостаточно денег!"); } }
 function buyMatterNode(id) {
     let cost = (id===10) ? 12 : (id===11 ? 14 : 80);
     if (state.boughtNodes.includes(id)) return;
@@ -198,7 +187,6 @@ function buyMatterNode(id) {
         updateUI();
     } else alert("Недостаточно материи!");
 }
-
 function buyMegaClick() { if (state.megaLevel < 5 && state.coins >= megaCosts[state.megaLevel]) { state.coins -= megaCosts[state.megaLevel]; state.megaLevel++; updateUI(); } }
 function buyMoneyUpgrade() { if(state.money>=state.moneyUpgradeCost){ state.money-=state.moneyUpgradeCost; state.moneyUpgrade++; state.moneyUpgradeCost=Math.floor(state.moneyUpgradeCost*1.5); updateUI(); } }
 function buyCoinUpgrade() { if(state.coins>=state.coinUpgradeCost){ state.coins-=state.coinUpgradeCost; state.coinUpgrade++; state.coinUpgradeCost=Math.floor(state.coinUpgradeCost*1.8); updateUI(); } }

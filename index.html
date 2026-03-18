@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8" />
-<title>Modern Clicker Ultra Final - Bug Fix Fix</title>
+<title>Modern Clicker Ultra Final - Fixed & Working</title>
 <style>
 :root { --bg: #020617; --card: #111827; --accent: #3b82f6; --green: #22c55e; --purple: #a855f7; --gold: #fbbf24; --matter: #60a5fa; }
 body { font-family: 'Segoe UI', Arial; background: var(--bg); color: white; margin: 0; overflow: hidden; display: flex; height: 100vh; width: 100vw; }
@@ -121,12 +121,12 @@ let state = {
     matterPerClick: 0.01, matterMultCoins: 1, autoPowerMult: 1, boughtNodes: []
 };
 
-const x3Costs =;
-const x5Costs =;
-const x15Costs =;
-const superCosts =;
-const megaCosts =;
-const rebirthGoals =;
+const x3Costs = [7500, 95000, 800000, 9000000, 35000000, 450000000, 3000000000];
+const x5Costs = [65000000, 1200000000, 10000000000];
+const x15Costs = [500000000, 3000000000];
+const superCosts = [200, 700, 3000, 7000, 16000, 40000, 140000, 370000, 650000, 1000000];
+const megaCosts = [200, 1000, 2000, 5000, 18000];
+const rebirthGoals = [100000, 16000000, 150000000, 820000000, 22000000000];
 
 let audioCtx = null, musicEnabled = false;
 
@@ -158,7 +158,7 @@ function clickMoney(e) {
 }
 
 function updateUI() {
-    if (isResetting) return;
+    if (isResetting || !state) return;
     document.getElementById('money').innerText = formatNum(state.money);
     document.getElementById('coins').innerText = formatNum(state.coins);
     document.getElementById('rebirths').innerText = state.rebirths;
@@ -171,10 +171,9 @@ function updateUI() {
     if(state.megaLevel < 5) document.getElementById('megaCost').innerText = formatNum(megaCosts[state.megaLevel]);
     else { document.getElementById('megaCost').innerText = "MAX"; document.getElementById('megaBtn').disabled = true; }
 
-    // ФИКС ШАНСА И ЦЕНЫ УДАЧИ
     document.getElementById('curChanceText').innerText = (state.coinChanceBase * 100).toFixed(0) + '%';
     let currentLvl = Math.round((state.coinChanceBase - 0.01) * 100); 
-    state.chanceUpgradeLevel = currentLvl; // Синхронизируем уровень с базой
+    state.chanceUpgradeLevel = currentLvl;
     let cCost = (currentLvl < 9) ? (5 + currentLvl * 10) : (100 * Math.pow(2, currentLvl - 9));
     document.getElementById('chanceCost').innerText = currentLvl < 29 ? formatNum(cCost) : "MAX";
     if(currentLvl >= 29) document.getElementById('chanceBtn').disabled = true;
@@ -221,8 +220,7 @@ function resetGame() {
     if(confirm("ВЫ УВЕРЕНЫ? ВСЁ БУДЕТ УДАЛЕНО!")) {
         isResetting = true;
         clearInterval(autoInterval);
-        localStorage.removeItem('click_v12');
-        state = null; // Принудительно убиваем объект в памяти
+        localStorage.clear();
         location.reload();
     }
 }
@@ -239,8 +237,6 @@ window.onload = function() {
     if(s) {
         let loaded = JSON.parse(s);
         state = {...state, ...loaded};
-        // ФИКС УРОВНЯ УДАЧИ ПРИ ЗАГРУЗКЕ
-        state.chanceUpgradeLevel = Math.round((state.coinChanceBase - 0.01) * 100);
         updateUI();
     }
 }

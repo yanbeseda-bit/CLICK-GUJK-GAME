@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8" />
-<title>Modern Clicker Ultra Final - Total Fix</title>
+<title>Modern Clicker Ultra Final - Bug Fix Fix</title>
 <style>
 :root { --bg: #020617; --card: #111827; --accent: #3b82f6; --green: #22c55e; --purple: #a855f7; --gold: #fbbf24; --matter: #60a5fa; }
 body { font-family: 'Segoe UI', Arial; background: var(--bg); color: white; margin: 0; overflow: hidden; display: flex; height: 100vh; width: 100vw; }
@@ -111,6 +111,7 @@ line { stroke: #1e293b; stroke-width: 4; transition: 0.5s; opacity: 0; }
 
 <script>
 let autoInterval = null;
+let isResetting = false;
 
 let state = {
     money: 0, coins: 0, rebirths: 0, points: 0, matter: 0,
@@ -120,12 +121,12 @@ let state = {
     matterPerClick: 0.01, matterMultCoins: 1, autoPowerMult: 1, boughtNodes: []
 };
 
-const x3Costs = [7500, 95000, 800000, 9000000, 35000000, 450000000, 3000000000];
-const x5Costs = [65000000, 1200000000, 10000000000];
-const x15Costs = [500000000, 3000000000];
-const superCosts = [200, 700, 3000, 7000, 16000, 40000, 140000, 370000, 650000, 1000000];
-const megaCosts = [200, 1000, 2000, 5000, 18000];
-const rebirthGoals = [100000, 16000000, 150000000, 820000000, 22000000000];
+const x3Costs =;
+const x5Costs =;
+const x15Costs =;
+const superCosts =;
+const megaCosts =;
+const rebirthGoals =;
 
 let audioCtx = null, musicEnabled = false;
 
@@ -149,6 +150,7 @@ function processRewards() {
 }
 
 function clickMoney(e) {
+    if (isResetting) return;
     let p = getTotalClick(); state.money += p; processRewards();
     let anim = document.createElement('div'); anim.className = 'click-anim'; anim.innerText = '+' + formatNum(p);
     anim.style.left = e.pageX + 'px'; anim.style.top = e.pageY + 'px';
@@ -156,6 +158,7 @@ function clickMoney(e) {
 }
 
 function updateUI() {
+    if (isResetting) return;
     document.getElementById('money').innerText = formatNum(state.money);
     document.getElementById('coins').innerText = formatNum(state.coins);
     document.getElementById('rebirths').innerText = state.rebirths;
@@ -168,9 +171,13 @@ function updateUI() {
     if(state.megaLevel < 5) document.getElementById('megaCost').innerText = formatNum(megaCosts[state.megaLevel]);
     else { document.getElementById('megaCost').innerText = "MAX"; document.getElementById('megaBtn').disabled = true; }
 
+    // ФИКС ШАНСА И ЦЕНЫ УДАЧИ
     document.getElementById('curChanceText').innerText = (state.coinChanceBase * 100).toFixed(0) + '%';
-    let cCost = (state.chanceUpgradeLevel < 9) ? (5 + state.chanceUpgradeLevel * 10) : (100 * Math.pow(2, state.chanceUpgradeLevel - 9));
-    document.getElementById('chanceCost').innerText = state.chanceUpgradeLevel < 29 ? formatNum(cCost) : "MAX";
+    let currentLvl = Math.round((state.coinChanceBase - 0.01) * 100); 
+    state.chanceUpgradeLevel = currentLvl; // Синхронизируем уровень с базой
+    let cCost = (currentLvl < 9) ? (5 + currentLvl * 10) : (100 * Math.pow(2, currentLvl - 9));
+    document.getElementById('chanceCost').innerText = currentLvl < 29 ? formatNum(cCost) : "MAX";
+    if(currentLvl >= 29) document.getElementById('chanceBtn').disabled = true;
     
     document.getElementById('superLvl').innerText = state.superLevel;
     if (state.superLevel < 10) document.getElementById('superCost').innerText = formatNum(superCosts[state.superLevel]);
@@ -180,6 +187,7 @@ function updateUI() {
         document.getElementById('matterDisplay').style.display = 'block';
         document.getElementById('matter').innerText = state.matter.toFixed(2);
         document.querySelectorAll('.matter-node').forEach(n => n.style.display = 'flex');
+        if (state.boughtNodes.includes(10)) { document.getElementById('ml2').classList.add('active-matter-line'); document.getElementById('ml3').classList.add('active-matter-line'); }
     }
     
     document.getElementById('rebInfo').innerText = "Нужно: " + formatNum(rebirthGoals[state.rebirths] || 100000000000);
@@ -191,7 +199,6 @@ function updateUI() {
         let n = document.getElementById('node'+id); if(n) n.classList.add('bought');
         if(id===0) { document.getElementById('l1').classList.add('active-line'); document.getElementById('l2').classList.add('active-line'); document.getElementById('l3').classList.add('active-line'); }
         if(id===3) document.getElementById('ml1').classList.add('active-matter-line');
-        if(id===10) { document.getElementById('ml2').classList.add('active-matter-line'); document.getElementById('ml3').classList.add('active-matter-line'); }
     });
     localStorage.setItem('click_v12', JSON.stringify(state));
 }
@@ -200,7 +207,7 @@ function buyAuto() { if(state.money>=state.autoCost){ state.money-=state.autoCos
 function buyMegaClick() { if (state.megaLevel < 5 && state.coins >= megaCosts[state.megaLevel]) { state.coins -= megaCosts[state.megaLevel]; state.megaLevel++; updateUI(); } }
 function buyMoneyUpgrade() { if(state.money>=state.moneyUpgradeCost){ state.money-=state.moneyUpgradeCost; state.moneyUpgrade++; state.moneyUpgradeCost=Math.floor(state.moneyUpgradeCost*1.5); updateUI(); } }
 function buyCoinUpgrade() { if(state.coins>=state.coinUpgradeCost){ state.coins-=state.coinUpgradeCost; state.coinUpgrade++; state.coinUpgradeCost=Math.floor(state.coinUpgradeCost*1.8); updateUI(); } }
-function buyChanceUpgrade() { let c = (state.chanceUpgradeLevel < 9) ? (5 + state.chanceUpgradeLevel * 10) : (100 * Math.pow(2, state.chanceUpgradeLevel - 9)); if(state.coins>=c && state.chanceUpgradeLevel < 29){ state.coins-=c; state.chanceUpgradeLevel++; state.coinChanceBase+=0.01; updateUI(); } }
+function buyChanceUpgrade() { let cost = (state.chanceUpgradeLevel < 9) ? (5 + state.chanceUpgradeLevel * 10) : (100 * Math.pow(2, state.chanceUpgradeLevel - 9)); if(state.coins>=cost && state.chanceUpgradeLevel < 29){ state.coins-=cost; state.coinChanceBase+=0.01; updateUI(); } }
 function buyX3() { if(state.x3Level < x3Costs.length && state.money >= x3Costs[state.x3Level]){ state.money -= x3Costs[state.x3Level]; state.x3Level++; updateUI(); } }
 function buyX5() { if(state.x5Level < x5Costs.length && state.money >= x5Costs[state.x5Level]){ state.money -= x5Costs[state.x5Level]; state.x5Level++; updateUI(); } }
 function buyX15() { if(state.x15Level < x15Costs.length && state.money >= x15Costs[state.x15Level]){ state.money -= x15Costs[state.x15Level]; state.x15Level++; updateUI(); } }
@@ -211,9 +218,11 @@ function rebirth() { let goal = rebirthGoals[state.rebirths] || 100000000000; if
 function enterPromoCode() { if(prompt("Код:")==="GUJK1228CV") { state.money+=1000000000; updateUI(); } }
 
 function resetGame() {
-    if(confirm("Вы уверены? Весь прогресс будет удален!")) {
-        clearInterval(autoInterval); // ПОЛНАЯ ОСТАНОВКА
-        localStorage.clear();
+    if(confirm("ВЫ УВЕРЕНЫ? ВСЁ БУДЕТ УДАЛЕНО!")) {
+        isResetting = true;
+        clearInterval(autoInterval);
+        localStorage.removeItem('click_v12');
+        state = null; // Принудительно убиваем объект в памяти
         location.reload();
     }
 }
@@ -221,15 +230,17 @@ function resetGame() {
 function openTree() { document.getElementById('treeModal').style.display='block'; }
 function closeTree() { document.getElementById('treeModal').style.display='none'; }
 function toggleMusic() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); musicEnabled = !musicEnabled; document.getElementById('musStatus').innerText = musicEnabled ? "ВКЛ" : "ВЫКЛ"; if (musicEnabled) playTune(); }
-function playTune() { if (!musicEnabled) return; let osc = audioCtx.createOscillator(), gain = audioCtx.createGain(); osc.type = 'triangle'; osc.connect(gain); gain.connect(audioCtx.destination); let sequence = [329.63, 293.66, 261.63, 293.66]; let now = audioCtx.currentTime; sequence.forEach((f, i) => osc.frequency.setValueAtTime(f, now + i * 0.8)); gain.gain.setValueAtTime(0.03, now); gain.gain.exponentialRampToValueAtTime(0.0001, now + 3); osc.start(); osc.stop(now + 3.2); setTimeout(playTune, 3200); }
+function playTune() { if (!musicEnabled || isResetting) return; let osc = audioCtx.createOscillator(), gain = audioCtx.createGain(); osc.type = 'triangle'; osc.connect(gain); gain.connect(audioCtx.destination); let sequence = [329.63, 293.66, 261.63, 293.66]; let now = audioCtx.currentTime; sequence.forEach((f, i) => osc.frequency.setValueAtTime(f, now + i * 0.8)); gain.gain.setValueAtTime(0.03, now); gain.gain.exponentialRampToValueAtTime(0.0001, now + 3); osc.start(); osc.stop(now + 3.2); setTimeout(playTune, 3200); }
 
-autoInterval = setInterval(() => { if(state.autoLevel>0){ state.money += (state.autoLevel * getTotalClick() * 0.1 * state.autoPowerMult); processRewards(); updateUI(); }}, 1000);
+autoInterval = setInterval(() => { if(state && state.autoLevel>0 && !isResetting){ state.money += (state.autoLevel * getTotalClick() * 0.1 * state.autoPowerMult); processRewards(); updateUI(); }}, 1000);
 
 window.onload = function() {
     let s = localStorage.getItem('click_v12');
     if(s) {
         let loaded = JSON.parse(s);
-        state = {...state, ...loaded}; // ПРАВИЛЬНОЕ СЛИЯНИЕ СТАРЫХ И НОВЫХ ДАННЫХ
+        state = {...state, ...loaded};
+        // ФИКС УРОВНЯ УДАЧИ ПРИ ЗАГРУЗКЕ
+        state.chanceUpgradeLevel = Math.round((state.coinChanceBase - 0.01) * 100);
         updateUI();
     }
 }

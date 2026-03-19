@@ -195,8 +195,16 @@ function updateUI() {
         if (state.boughtNodes.includes(10)) { document.getElementById('ml2').classList.add('active-matter-line'); document.getElementById('ml3').classList.add('active-matter-line'); }
     }
     // пока что последний ребирт
-    let goal = rebirthGoals[state.rebirths] || 10000000000000; // 1e 13 13t
+    if (state.rebirths < rebirthGoals.length) {
+    // Если еще есть цели в массиве, показываем цену
+    let goal = rebirthGoals[state.rebirths];
     document.getElementById('rebInfo').innerText = "Нужно: " + formatNum(goal);
+} else {
+    // Если купили последний доступный ребирт
+    document.getElementById('rebInfo').innerText = "MAX РЕБИРТ";
+    // Чтобы кнопка тоже стала неактивной (как у супер-клика)
+    document.getElementById('rebBtn').disabled = true; 
+}
     document.getElementById('x3Info').innerText = state.x3Level < x3Costs.length ? "Цена: " + formatNum(x3Costs[state.x3Level]) : "MAX";
     document.getElementById('x5Info').innerText = state.x5Level < x5Costs.length ? "Цена: " + formatNum(x5Costs[state.x5Level]) : "MAX";
     document.getElementById('x15Info').innerText = state.x15Level < x15Costs.length ? "Цена: " + formatNum(x15Costs[state.x15Level]) : "MAX";

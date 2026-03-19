@@ -101,50 +101,7 @@ line { stroke: #1e293b; stroke-width: 4; transition: 0.5s; opacity: 0; }
     <div class="card"><h3>Автокликер</h3><p>Цена: <span id="autoCost">2K</span></p><button onclick="buyAuto()">Купить</button></div>
 </div>
 <!-- снизу кнопка закрытия дерева  -->
-<div id="treeModal">
-    <button class="close-tree" onclick="closeTree()">Закрыть [X]</button>
-    <div id="treeViewport">
-        <div id="treeContainer">
-            <svg style="width:100%; height:100%;">
-                <line id="l1" x1="400" y1="300" x2="600" y2="300" /> <line id="l2" x1="400" y1="300" x2="400" y2="500" /> <line id="l3" x1="400" y1="300" x2="200" y2="300" /> <line id="l4" x1="600" y1="300" x2="800" y2="300" /> <line id="ml1" x1="200" y1="300" x2="100" y2="200" />
-                <line id="ml2" x1="100" y1="200" x2="100" y2="50" />
-                <line id="ml3" x1="100" y1="200" x2="250" y2="100" />
-            </svg>
-
-            <div id="node0" class="node" style="left: 400px; top: 300px;" onclick="buyTreeNode(0)">
-                <b>Центр</b><br>Сила x2, +1 мон.<br>1 ⭐
-            </div>
-
-            <div id="node1" class="node" style="left: 600px; top: 300px;" onclick="buyTreeNode(1)">
-                <b>Удача</b><br>Магазин монет<br>1 ⭐
-            </div>
-
-            <div id="node4" class="node" style="left: 800px; top: 300px;" onclick="buyTreeNode(4)">
-                <b>Азарт</b><br>Клик x100 (1%)<br>1 ⭐
-            </div>
-
-            <div id="node2" class="node" style="left: 400px; top: 500px;" onclick="buyTreeNode(2)">
-                <b>Мощь</b><br>Открыть x5<br>1 ⭐
-            </div>
-
-            <div id="node3" class="node" style="left: 200px; top: 300px;" onclick="buyTreeNode(3)">
-                <b>Материя</b><br>+0.01 мат/клик<br>+2 монеты<br>1 ⭐
-            </div>
-
-            <div id="node10" class="node matter-node" style="left: 100px; top: 200px; display:none" onclick="buyMatterNode(10)">
-                <b>Синтез</b><br>x2 мон., Авто x3<br>12 ⚛️
-            </div>
-
-            <div id="node11" class="node matter-node" style="left: 100px; top: 50px; display:none" onclick="buyMatterNode(11)">
-                <b>Поток</b><br>+0.05 мат/клик<br>14 ⚛️
-            </div>
-
-            <div id="node12" class="node matter-node" style="left: 250px; top: 100px; display:none" onclick="buyMatterNode(12)">
-                <b>Разрыв</b><br>x2 Клик + Магаз<br>80 ⚛️
-            </div>
-        </div>
-    </div>
-</div>
+<div id="treeModal"><button class="close-tree" onclick="closeTree()">Закрыть [X]</button><div id="treeViewport"><div id="treeContainer"><svg style="width:100%; height:100%;"><line id="l1" x1="400" y1="300" x2="600" y2="300" /><line id="l2" x1="400" y1="300" x2="400" y2="500" /><line id="l3" x1="400" y1="300" x2="200" y2="300" /><line id="ml1" x1="200" y1="300" x2="100" y2="200" /><line id="ml2" x1="100" y1="200" x2="100" y2="50" /><line id="ml3" x1="100" y1="200" x2="250" y2="100" /></svg><div id="node0" class="node" style="left: 400px; top: 300px;" onclick="buyTreeNode(0)"><b>Центр</b><br>Сила x2, +1 мон.<br>1 ⭐</div><div id="node1" class="node" style="left: 600px; top: 300px;" onclick="buyTreeNode(1)"><b>Удача</b><br>Магазин монет<br>1 ⭐</div><div id="node2" class="node" style="left: 400px; top: 500px;" onclick="buyTreeNode(2)"><b>Мощь</b><br>Открыть x5<br>1 ⭐</div><div id="node3" class="node" style="left: 200px; top: 300px;" onclick="buyTreeNode(3)"><b>Материя</b><br>+0.01 мат/клик<br>+2 монеты<br>1 ⭐</div><div id="node10" class="node matter-node" style="left: 100px; top: 200px; display:none" onclick="buyMatterNode(10)"><b>Синтез</b><br>x2 мон., Авто x3<br>12 ⚛️</div><div id="node11" class="node matter-node" style="left: 100px; top: 50px; display:none" onclick="buyMatterNode(11)"><b>Поток</b><br>+0.05 мат/клик<br>14 ⚛️</div><div id="node12" class="node matter-node" style="left: 250px; top: 100px; display:none" onclick="buyMatterNode(12)"><b>Разрыв</b><br>x2 Клик + Магаз<br>80 ⚛️</div></div></div></div>
 <!-- Зброс всего? -->
 <script>
 let autoInterval = null, isResetting = false;
@@ -257,30 +214,6 @@ function updateUI() {
         if(id===0) { document.getElementById('l1').classList.add('active-line'); document.getElementById('l2').classList.add('active-line'); document.getElementById('l3').classList.add('active-line'); }
         if(id===3) document.getElementById('ml1').classList.add('active-matter-line');
     });
-    // --- ПРОВЕРКА КУПЛЕННЫХ УЗЛОВ (чтобы магазины не исчезали) ---
-    if (state.boughtNodes.includes(1)) {
-        document.getElementById('secretShop').style.display = 'block';
-    }
-    if (state.boughtNodes.includes(2)) {
-        document.getElementById('x5Shop').style.display = 'block';
-    }
-    // Проверка для новой кнопки Азарт (4) или Разрыва из материи (12)
-    if (state.boughtNodes.includes(4) || state.boughtNodes.includes(12)) {
-        document.getElementById('x15Shop').style.display = 'block';
-    }
-    if (state.boughtNodes.includes(4) || state.boughtNodes.includes(12)) {
-        document.getElementById('x15Shop').style.display = 'block';
-    }
-
-    // ВОТ ОН — ТВОЙ ЩИТ ОТ БАГОВ:
-    let tempMult = 1;
-    if (state.boughtNodes.includes(0)) tempMult *= 2; 
-    if (state.boughtNodes.includes(4)) tempMult *= 10;
-    if (state.boughtNodes.includes(12)) tempMult *= 2;
-    state.treeX2 = tempMult; 
-
-    // сохранение игры
-    localStorage.setItem('click_v12', JSON.stringify(state));
     // сохранение игры
     localStorage.setItem('click_v12', JSON.stringify(state));
 }
@@ -313,74 +246,8 @@ function buyX5() { if(state.x5Level < x5Costs.length && state.money >= x5Costs[s
 function buyX15() { if(state.x15Level < x15Costs.length && state.money >= x15Costs[state.x15Level]){ state.money -= x15Costs[state.x15Level]; state.x15Level++; updateUI(); } }
 function buySuperClick() { if(state.coins>=superCosts[state.superLevel] && state.superLevel < 10){ state.coins-=superCosts[state.superLevel]; state.superLevel++; updateUI(); } }
                // СНАЧАЛА ЦЕНТР запрещает покупать другое пока не купить это
-function buyTreeNode(id) {
-    // 1. Проверка на Центр
-    if (id !== 0 && !state.boughtNodes.includes(0)) return alert("Сначала Центр!");
-
-    // 2. ЗАЩИТА: Кнопка 4 (Азарт) требует кнопку 1 (Удача)
-    if (id === 4 && !state.boughtNodes.includes(1)) return alert("Сначала купите 'Удачу'!");
-
-    // 3. Логика покупки
-    if (state.points >= 1 && !state.boughtNodes.includes(id)) {
-        state.points--;
-        state.boughtNodes.push(id);
-
-        // Старые бонусы
-        if(id === 0) { state.treeX2 = 2; state.treeBonusCoins += 1; }
-        if(id === 1) document.getElementById('secretShop').style.display = 'block';
-        if(id === 2) document.getElementById('x5Shop').style.display = 'block';
-        if(id === 3) state.treeBonusCoins += 2;
-        // НОВЫЙ БОНУС (Твоя кнопка №4 - Азарт)
-        if(id === 4) {
-            // 1. Множитель клика (можешь менять 10 на любое число)
-            state.treeX2 *= 10; 
-
-            // 2. Разовый подарок денег (удали, если не нужно)
-            state.money += 1000000; 
-
-            // 3. Открытие нового магазина (замени 'x15Shop' на свой ID, если создашь новый)
-            document.getElementById('x15Shop').style.display = 'block';
-            
-            // Здесь ты можешь добавить любую другую строку, например:
-            // alert("Вы получили секретный бонус!");
-        }
-        // НОВЫЙ БОНУС (Твоя кнопка №4)
-        if(id === 4) {
-    state.pointsPerRebirth = 2; // Создаем новую переменную: сколько давать за ребирт
-    alert("Теперь за каждое перерождение вы будете получать 2 очка!");
-}
-        }
-
-        updateUI();
-    }
-}
-function rebirth() {
-    // 1. ДОБАВЛЯЕМ ЭТУ ПРОВЕРКУ (Защита от бага 10Т)
-    if (state.rebirths >= rebirthGoals.length) {
-        alert("Максимальный ребирт уже достигнут!");
-        return; // Функция прерывается здесь и не идет дальше к сбросу денег
-    }
-
-    // 2. Твой текущий код (но убираем 10000000000000)
-    let goal = rebirthGoals[state.rebirths]; 
-
-    if (state.money >= goal) {
-        // Весь твой блок сброса:
-        state.money = 0;
-        state.moneyUpgrade = 0;
-        state.moneyUpgradeCost = 30;
-        state.autoLevel = 0;
-        state.autoCost = 2000;
-        state.x3Level = 0;
-        state.x5Level = 0;
-        // Если у тебя есть x15, добавь и его:
-        if(state.x15Level !== undefined) state.x15Level = 0;
-
-        state.rebirths++;
-        state.points += (state.pointsPerRebirth || 1);
-        updateUI(); 
-    }
-}
+function buyTreeNode(id) { if (id !== 0 && !state.boughtNodes.includes(0)) return alert("Сначала Центр!"); if (state.points >= 1 && !state.boughtNodes.includes(id)) { state.points--; state.boughtNodes.push(id); if(id===0) { state.treeX2=2; state.treeBonusCoins+=1; } if(id===1) document.getElementById('secretShop').style.display='block'; if(id===2) document.getElementById('x5Shop').style.display='block'; if(id===3) state.treeBonusCoins+=2; updateUI(); }}
+function rebirth() { let goal = rebirthGoals[state.rebirths] || 10000000000000; if(state.money >= goal) { state.money = 0; state.moneyUpgrade = 0; state.moneyUpgradeCost = 30; state.autoLevel = 0; state.autoCost = 2000; state.x3Level = 0; state.x5Level = 0; state.rebirths++; state.points++; updateUI(); } }
      // админ код
 function enterPromoCode() {
     let code = prompt("Введите код:"); 

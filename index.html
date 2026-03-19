@@ -377,15 +377,11 @@ function buyTreeNode(id) {
     document.getElementById('plus5CoinsShop').style.display = 'block';
     
     // (По желанию можно оставить множитель клика, если хочешь)
-    state.treeX2 *= 10; 
-}
-        }
-        }
-
-        updateUI();
-    
-}
-function rebirth() {
+            state.treeX2 *= 10;
+     } // Закрывает if (id === 4)
+     updateUI();
+ } 
+ function rebirth() { // Новая функция начинается отдельно
     // 1. ДОБАВЛЯЕМ ЭТУ ПРОВЕРКУ (Защита от бага 10Т)
     if (state.rebirths >= rebirthGoals.length) {
         alert("Максимальный ребирт уже достигнут!");

@@ -124,6 +124,7 @@ const rebirthGoals = [100000, 16000000, 150000000, 82e7, 95e9, 11e13, 25e15, 63e
 let audioCtx = null, musicEnabled = false;
 // суммы чисел в игре после e идут 0 
 function formatNum(num) {
+    if (num >= 1e21) return (num / 1e21).toFixed(2) + "Sx"
     if (num >= 1e18) return (num / 1e18).toFixed(2) + "QI"
     if (num >= 1e15) return (num / 1e15).toFixed(2) + "Qa"
     if (num >= 1e12) return (num / 1e12).toFixed(2) + 'T';

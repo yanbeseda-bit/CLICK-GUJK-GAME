@@ -435,7 +435,7 @@ function toggleMusic() { if (!audioCtx) audioCtx = new (window.AudioContext || w
 function playTune() { if (!musicEnabled || isResetting) return; let osc = audioCtx.createOscillator(), gain = audioCtx.createGain(); osc.type = 'triangle'; osc.connect(gain); gain.connect(audioCtx.destination); gain.gain.setValueAtTime(0.03, audioCtx.currentTime); osc.start(); osc.stop(audioCtx.currentTime + 3); setTimeout(playTune, 3200); }
 
 autoInterval = setInterval(() => { if(state && state.autoLevel>0 && !isResetting){ state.money += (state.autoLevel * getTotalClick() * 0.1 * state.autoPowerMult); processRewards(); updateUI(); }}, 1000);
-window.onload = function() { let s = localStorage.getItem('click_v12'); if(s) { state = {...state, ...JSON.parse(s)}; updateUI(); } }
+
     function buyCryptomania() {
     let lvl = state.cryptomanialevel || 0;
 

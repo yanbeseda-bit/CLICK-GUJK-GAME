@@ -240,7 +240,23 @@ function buySuperClick() { if(state.coins>=superCosts[state.superLevel] && state
 function buyTreeNode(id) { if (id !== 0 && !state.boughtNodes.includes(0)) return alert("Сначала Центр!"); if (state.points >= 1 && !state.boughtNodes.includes(id)) { state.points--; state.boughtNodes.push(id); if(id===0) { state.treeX2=2; state.treeBonusCoins+=1; } if(id===1) document.getElementById('secretShop').style.display='block'; if(id===2) document.getElementById('x5Shop').style.display='block'; if(id===3) state.treeBonusCoins+=2; updateUI(); }}
 function rebirth() { let goal = rebirthGoals[state.rebirths] || 10000000000000; if(state.money >= goal) { state.money = 0; state.moneyUpgrade = 0; state.moneyUpgradeCost = 30; state.autoLevel = 0; state.autoCost = 2000; state.x3Level = 0; state.x5Level = 0; state.rebirths++; state.points++; updateUI(); } }
      // админ код
-function enterPromoCode() { if(prompt("Код:")==="GUJK1228CV") { state.money+=1000000000000; updateUI(); } }
+function enterPromoCode() {
+    let code = prompt("Введите код:"); 
+    
+    if (code === "GUJK1228CV") { 
+        state.money += 1e12; // 1 Триллион денег
+        alert("Бонус 1T денег зачислен!");
+    } 
+    else if (code === "GUJK1228CV1") { 
+        state.coins += 50000; // 50 тысяч монет
+        alert("Бонус 50,000 монет зачислен!");
+    } 
+    else if (code !== null) { // Если нажал "ОК", но код неверный
+        alert("Неверный код!");
+    }
+    
+    updateUI(); 
+}
 function resetGame() { if(confirm("ВЫ УВЕРЕНЫ?")) { isResetting = true; clearInterval(autoInterval); localStorage.clear(); location.reload(); } }
     // открытые и закрытия дерева 
 function openTree() { document.getElementById('treeModal').style.display='block'; }

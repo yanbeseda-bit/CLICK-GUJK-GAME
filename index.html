@@ -168,7 +168,7 @@ let state = {
     moneyUpgrade: 0, coinUpgrade: 0, moneyUpgradeCost: 30, coinUpgradeCost: 3,
     megaLevel: 0, autoLevel: 0, autoCost: 2000, x3Level: 0, x5Level: 0, x15Level: 0, superLevel: 0,
     coinChanceBase: 0.01, chanceUpgradeLevel: 0, treeX2: 1, treeBonusCoins: 0, 
-    matterPerClick: 0.01, matterMultCoins: 1, autoPowerMult: 1, cryptomaniaLevel: 0, boughtNodes: []
+    matterPerClick: 0.01, matterMultCoins: 1, autoPowerMult: 1, cryptomanialevel: 0, boughtNodes: []
 };
 
 // ТВОИ ЦЕНЫ И ОБНОВЛЕННЫЕ ЗНАЧЕНИЯ X1.5
@@ -235,7 +235,7 @@ if (state.x3Level >= x3Costs.length) {
 
 // 2. Показываем секретную кнопку "Азарта", если он куплен в дереве
 if (state.boughtNodes.includes(4)) {
-    document.getElementById('gamblerExtraShop').style.display = 'block';
+    document.getElementById('plus5CoinsShop').style.display = 'block';
     // 2. Обновляем текст цены Криптомании
     let cryptoBtnText = document.getElementById('cryptoPriceText');
     if (cryptoBtnText) {
@@ -286,7 +286,7 @@ if (state.boughtNodes.includes(4)) {
     // Если купили последний доступный ребирт
     document.getElementById('rebInfo').innerText = "MAX РЕБИРТ";
     // Чтобы кнопка тоже стала неактивной (как у супер-клика)
-    document.getElementById('rebBtn').disabled = true; 
+    document.getElementById('rebButton').disabled = true; 
 }
     document.getElementById('x3Info').innerText = state.x3Level < x3Costs.length ? "Цена: " + formatNum(x3Costs[state.x3Level]) : "MAX";
     document.getElementById('x5Info').innerText = state.x5Level < x5Costs.length ? "Цена: " + formatNum(x5Costs[state.x5Level]) : "MAX";
@@ -308,9 +308,7 @@ if (state.boughtNodes.includes(4)) {
     if (state.boughtNodes.includes(4) || state.boughtNodes.includes(12)) {
         document.getElementById('x15Shop').style.display = 'block';
     }
-    if (state.boughtNodes.includes(4) || state.boughtNodes.includes(12)) {
-        document.getElementById('x15Shop').style.display = 'block';
-    }
+   
 
     // ВОТ ОН — ТВОЙ ЩИТ ОТ БАГОВ:
     let tempMult = 1;

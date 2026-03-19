@@ -95,13 +95,71 @@ line { stroke: #1e293b; stroke-width: 4; transition: 0.5s; opacity: 0; }
 <div class="side-panel right">
     <h2 style="text-align:center">💸 Магазин</h2>
     <div class="card"><h3>Сила клика</h3><p>Цена: <span id="moneyUpgradeCost">30</span></p><button onclick="buyMoneyUpgrade()">Купить</button></div>
-    <div class="card"><h3>Улучшение x3</h3><p id="x3Info">Цена: 7.5K</p><button id="x3Btn" onclick="buyX3()">Купить</button></div>
+    
+    <div id="x3Block" class="card">
+    <h3>Улучшение x3</h3>
+    <p id="x3Info">Цена: 7.5K</p>
+    <button id="x3Btn" onclick="buyX3()">Купить</button>
+</div>
     <div id="x5Shop" style="display: none;"><div class="card" style="border: 1px solid var(--accent);"><h3>🔥 Супер x5</h3><p id="x5Info">Цена: 65M</p><button id="x5Btn" onclick="buyX5()">Купить</button></div></div>
     <div id="x15Shop" style="display: none;"><div class="card" style="border: 1px solid #f87171;"><h3>🌌 Ультра x1.5</h3><p id="x15Info">Цена: 12B</p><button id="x15Btn" onclick="buyX15()">Купить</button></div></div>
     <div class="card"><h3>Автокликер</h3><p>Цена: <span id="autoCost">2K</span></p><button onclick="buyAuto()">Купить</button></div>
 </div>
+    <div class="card"><h3>Автокликер</h3><p>Цена: <span id="autoCost">2K</span></p><button onclick="buyAuto()">Купить</button></div>
+
+<div id="plus5CoinsShop" class="card" style="display: none; border: 2px solid #00ffcc;">
+    <h3>₿ Криптомания</h3>
+    <p>Дает +5 монет за клик</p>
+    <p id="cryptoPriceText">Цена: 1.0B</p> 
+    <button onclick="buyCryptomania()">Купить</button>
+</div>
+
+</div>
 <!-- снизу кнопка закрытия дерева  -->
-<div id="treeModal"><button class="close-tree" onclick="closeTree()">Закрыть [X]</button><div id="treeViewport"><div id="treeContainer"><svg style="width:100%; height:100%;"><line id="l1" x1="400" y1="300" x2="600" y2="300" /><line id="l2" x1="400" y1="300" x2="400" y2="500" /><line id="l3" x1="400" y1="300" x2="200" y2="300" /><line id="ml1" x1="200" y1="300" x2="100" y2="200" /><line id="ml2" x1="100" y1="200" x2="100" y2="50" /><line id="ml3" x1="100" y1="200" x2="250" y2="100" /></svg><div id="node0" class="node" style="left: 400px; top: 300px;" onclick="buyTreeNode(0)"><b>Центр</b><br>Сила x2, +1 мон.<br>1 ⭐</div><div id="node1" class="node" style="left: 600px; top: 300px;" onclick="buyTreeNode(1)"><b>Удача</b><br>Магазин монет<br>1 ⭐</div><div id="node2" class="node" style="left: 400px; top: 500px;" onclick="buyTreeNode(2)"><b>Мощь</b><br>Открыть x5<br>1 ⭐</div><div id="node3" class="node" style="left: 200px; top: 300px;" onclick="buyTreeNode(3)"><b>Материя</b><br>+0.01 мат/клик<br>+2 монеты<br>1 ⭐</div><div id="node10" class="node matter-node" style="left: 100px; top: 200px; display:none" onclick="buyMatterNode(10)"><b>Синтез</b><br>x2 мон., Авто x3<br>12 ⚛️</div><div id="node11" class="node matter-node" style="left: 100px; top: 50px; display:none" onclick="buyMatterNode(11)"><b>Поток</b><br>+0.05 мат/клик<br>14 ⚛️</div><div id="node12" class="node matter-node" style="left: 250px; top: 100px; display:none" onclick="buyMatterNode(12)"><b>Разрыв</b><br>x2 Клик + Магаз<br>80 ⚛️</div></div></div></div>
+<div id="treeModal">
+    <button class="close-tree" onclick="closeTree()">Закрыть [X]</button>
+    <div id="treeViewport">
+        <div id="treeContainer">
+            <svg style="width:100%; height:100%;">
+                <line id="l1" x1="400" y1="300" x2="600" y2="300" /> <line id="l2" x1="400" y1="300" x2="400" y2="500" /> <line id="l3" x1="400" y1="300" x2="200" y2="300" /> <line id="l4" x1="600" y1="300" x2="800" y2="300" /> <line id="ml1" x1="200" y1="300" x2="100" y2="200" />
+                <line id="ml2" x1="100" y1="200" x2="100" y2="50" />
+                <line id="ml3" x1="100" y1="200" x2="250" y2="100" />
+            </svg>
+
+            <div id="node0" class="node" style="left: 400px; top: 300px;" onclick="buyTreeNode(0)">
+                <b>Центр</b><br>Сила x2, +1 мон.<br>1 ⭐
+            </div>
+
+            <div id="node1" class="node" style="left: 600px; top: 300px;" onclick="buyTreeNode(1)">
+                <b>Удача</b><br>Магазин монет<br>1 ⭐
+            </div>
+
+            <div id="node4" class="node" style="left: 800px; top: 300px;" onclick="buyTreeNode(4)">
+                <b>Азарт</b><br>Поинты x2 + Магазин<br>1 ⭐
+            </div>
+
+            <div id="node2" class="node" style="left: 400px; top: 500px;" onclick="buyTreeNode(2)">
+                <b>Мощь</b><br>Открыть x5<br>1 ⭐
+            </div>
+
+            <div id="node3" class="node" style="left: 200px; top: 300px;" onclick="buyTreeNode(3)">
+                <b>Материя</b><br>+0.01 мат/клик<br>+2 монеты<br>1 ⭐
+            </div>
+
+            <div id="node10" class="node matter-node" style="left: 100px; top: 200px; display:none" onclick="buyMatterNode(10)">
+                <b>Синтез</b><br>x2 монеты., АвтоКлик x3<br>12 ⚛️
+            </div>
+
+            <div id="node11" class="node matter-node" style="left: 100px; top: 50px; display:none" onclick="buyMatterNode(11)">
+                <b>Поток</b><br>+0.05 мат/клик<br>14 ⚛️
+            </div>
+
+            <div id="node12" class="node matter-node" style="left: 250px; top: 100px; display:none" onclick="buyMatterNode(12)">
+                <b>Разрыв</b><br>x2 Клик + Магаз<br>80 ⚛️
+            </div>
+        </div>
+    </div>
+</div>
 <!-- Зброс всего? -->
 <script>
 let autoInterval = null, isResetting = false;
@@ -110,13 +168,14 @@ let state = {
     moneyUpgrade: 0, coinUpgrade: 0, moneyUpgradeCost: 30, coinUpgradeCost: 3,
     megaLevel: 0, autoLevel: 0, autoCost: 2000, x3Level: 0, x5Level: 0, x15Level: 0, superLevel: 0,
     coinChanceBase: 0.01, chanceUpgradeLevel: 0, treeX2: 1, treeBonusCoins: 0, 
-    matterPerClick: 0.01, matterMultCoins: 1, autoPowerMult: 1, boughtNodes: []
+    matterPerClick: 0.01, matterMultCoins: 1, autoPowerMult: 1, cryptomaniaLevel: 0, boughtNodes: []
 };
 
 // ТВОИ ЦЕНЫ И ОБНОВЛЕННЫЕ ЗНАЧЕНИЯ X1.5
 const x3Costs = [7500, 95e3, 6e5, 5e6, 35e6, 1.5e9, 22e9, 91e10, 28e13];; // 5m 35m 150m 2.2b 91b
 const x5Costs = [65000000, 65e9, 1e12, 17e13, 485e14];
-const x15Costs = [12e9, 45e12, 92e14, 92e15]; // 12B и 450B
+const x15Costs = [12e9, 45e12, 92e14, 92e15];// 12B и 450B
+const plus5moneyCosts = [23e10, 923e14, 12e16, 8e17]
 const superCosts = [200, 700, 3000, 7000, 16000, 40000, 140000, 370000, 650000, 1000000];
 const megaCosts = [200, 1000, 2000, 5000, 18000];
 const rebirthGoals = [100000, 16000000, 150000000, 82e7, 95e9, 11e13, 25e15, 63e18];
@@ -167,6 +226,30 @@ function updateUI() {
     document.getElementById('moneyUpgradeCost').innerText = formatNum(state.moneyUpgradeCost);
     document.getElementById('coinUpgradeCost').innerText = formatNum(state.coinUpgradeCost);
     document.getElementById('autoCost').innerText = formatNum(state.autoCost);
+    // 1. Скрываем x3, если уровни закончились
+if (state.x3Level >= x3Costs.length) {
+    document.getElementById('x3Block').style.display = 'none';
+} else {
+    document.getElementById('x3Block').style.display = 'block';
+}
+
+// 2. Показываем секретную кнопку "Азарта", если он куплен в дереве
+if (state.boughtNodes.includes(4)) {
+    document.getElementById('gamblerExtraShop').style.display = 'block';
+    // 2. Обновляем текст цены Криптомании
+    let cryptoBtnText = document.getElementById('cryptoPriceText');
+    if (cryptoBtnText) {
+        let lvl = state.cryptomanialevel || 0;
+        // Используем твой массив цен plus5moneyCosts
+        if (lvl < plus5moneyCosts.length) {
+            cryptoBtnText.innerText = "Цена: " + formatNum(plus5moneyCosts[lvl]);
+        } else {
+            cryptoBtnText.innerText = "МАКСИМУМ";
+            // По желанию можно отключить кнопку:
+            // document.querySelector('#plus5CoinsShop button').disabled = true;
+        }
+    }
+}
     document.getElementById('megaLvl').innerText = state.megaLevel;
     //2. Мега Клик (строки 138–140)
     //Обновляет текущий уровень (от 0 до 5).
@@ -214,6 +297,30 @@ function updateUI() {
         if(id===0) { document.getElementById('l1').classList.add('active-line'); document.getElementById('l2').classList.add('active-line'); document.getElementById('l3').classList.add('active-line'); }
         if(id===3) document.getElementById('ml1').classList.add('active-matter-line');
     });
+    // --- ПРОВЕРКА КУПЛЕННЫХ УЗЛОВ (чтобы магазины не исчезали) ---
+    if (state.boughtNodes.includes(1)) {
+        document.getElementById('secretShop').style.display = 'block';
+    }
+    if (state.boughtNodes.includes(2)) {
+        document.getElementById('x5Shop').style.display = 'block';
+    }
+    // Проверка для новой кнопки Азарт (4) или Разрыва из материи (12)
+    if (state.boughtNodes.includes(4) || state.boughtNodes.includes(12)) {
+        document.getElementById('x15Shop').style.display = 'block';
+    }
+    if (state.boughtNodes.includes(4) || state.boughtNodes.includes(12)) {
+        document.getElementById('x15Shop').style.display = 'block';
+    }
+
+    // ВОТ ОН — ТВОЙ ЩИТ ОТ БАГОВ:
+    let tempMult = 1;
+    if (state.boughtNodes.includes(0)) tempMult *= 2; 
+    if (state.boughtNodes.includes(4)) tempMult *= 10;
+    if (state.boughtNodes.includes(12)) tempMult *= 2;
+    state.treeX2 = tempMult; 
+
+    // сохранение игры
+    localStorage.setItem('click_v12', JSON.stringify(state));
     // сохранение игры
     localStorage.setItem('click_v12', JSON.stringify(state));
 }
@@ -246,8 +353,68 @@ function buyX5() { if(state.x5Level < x5Costs.length && state.money >= x5Costs[s
 function buyX15() { if(state.x15Level < x15Costs.length && state.money >= x15Costs[state.x15Level]){ state.money -= x15Costs[state.x15Level]; state.x15Level++; updateUI(); } }
 function buySuperClick() { if(state.coins>=superCosts[state.superLevel] && state.superLevel < 10){ state.coins-=superCosts[state.superLevel]; state.superLevel++; updateUI(); } }
                // СНАЧАЛА ЦЕНТР запрещает покупать другое пока не купить это
-function buyTreeNode(id) { if (id !== 0 && !state.boughtNodes.includes(0)) return alert("Сначала Центр!"); if (state.points >= 1 && !state.boughtNodes.includes(id)) { state.points--; state.boughtNodes.push(id); if(id===0) { state.treeX2=2; state.treeBonusCoins+=1; } if(id===1) document.getElementById('secretShop').style.display='block'; if(id===2) document.getElementById('x5Shop').style.display='block'; if(id===3) state.treeBonusCoins+=2; updateUI(); }}
-function rebirth() { let goal = rebirthGoals[state.rebirths] || 10000000000000; if(state.money >= goal) { state.money = 0; state.moneyUpgrade = 0; state.moneyUpgradeCost = 30; state.autoLevel = 0; state.autoCost = 2000; state.x3Level = 0; state.x5Level = 0; state.rebirths++; state.points++; updateUI(); } }
+function buyTreeNode(id) {
+    // 1. Проверка на Центр
+    if (id !== 0 && !state.boughtNodes.includes(0)) return alert("Сначала Центр!");
+
+    // 2. ЗАЩИТА: Кнопка 4 (Азарт) требует кнопку 1 (Удача)
+    if (id === 4 && !state.boughtNodes.includes(1)) return alert("Сначала купите 'Удачу'!");
+
+    // 3. Логика покупки
+    if (state.points >= 1 && !state.boughtNodes.includes(id)) {
+        state.points--;
+        state.boughtNodes.push(id);
+
+        // Старые бонусы
+        if(id === 0) { state.treeX2 = 2; state.treeBonusCoins += 1; }
+        if(id === 1) document.getElementById('secretShop').style.display = 'block';
+        if(id === 2) document.getElementById('x5Shop').style.display = 'block';
+        if(id === 3) state.treeBonusCoins += 2;
+        // НОВЫЙ БОНУС (Твоя кнопка №4 - Азарт)
+        // НОВЫЙ БОНУС (Твоя кнопка №4 - Азарт)
+        if(id === 4) {
+    // 1. Реальный бонус: удваиваем поинты за ребирт
+    state.pointsPerRebirth = (state.pointsPerRebirth || 1) * 2;
+
+    // 2. Реальное действие: открываем кнопку Криптомании в магазине
+    document.getElementById('plus5CoinsShop').style.display = 'block';
+    
+    // (По желанию можно оставить множитель клика, если хочешь)
+    state.treeX2 *= 10; 
+}
+        }
+        }
+
+        updateUI();
+    }
+}
+function rebirth() {
+    // 1. ДОБАВЛЯЕМ ЭТУ ПРОВЕРКУ (Защита от бага 10Т)
+    if (state.rebirths >= rebirthGoals.length) {
+        alert("Максимальный ребирт уже достигнут!");
+        return; // Функция прерывается здесь и не идет дальше к сбросу денег
+    }
+
+    // 2. Твой текущий код (но убираем 10000000000000)
+    let goal = rebirthGoals[state.rebirths]; 
+
+    if (state.money >= goal) {
+        // Весь твой блок сброса:
+        state.money = 0;
+        state.moneyUpgrade = 0;
+        state.moneyUpgradeCost = 30;
+        state.autoLevel = 0;
+        state.autoCost = 2000;
+        state.x3Level = 0;
+        state.x5Level = 0;
+        // Если у тебя есть x15, добавь и его:
+        if(state.x15Level !== undefined) state.x15Level = 0;
+
+        state.rebirths++;
+        state.points += (state.pointsPerRebirth || 1);
+        updateUI(); 
+    }
+}
      // админ код
 function enterPromoCode() {
     let code = prompt("Введите код:"); 
@@ -276,6 +443,29 @@ function playTune() { if (!musicEnabled || isResetting) return; let osc = audioC
 
 autoInterval = setInterval(() => { if(state && state.autoLevel>0 && !isResetting){ state.money += (state.autoLevel * getTotalClick() * 0.1 * state.autoPowerMult); processRewards(); updateUI(); }}, 1000);
 window.onload = function() { let s = localStorage.getItem('click_v12'); if(s) { state = {...state, ...JSON.parse(s)}; updateUI(); } }
+    function buyCryptomania() {
+    let lvl = state.cryptomanialevel || 0;
+
+    // Если текущий уровень меньше, чем количество цен в массиве — покупаем
+    if (lvl < plus5moneyCosts.length) {
+        let price = plus5moneyCosts[lvl];
+
+        if (state.money >= price) {
+            state.money -= price;
+            state.cryptomanialevel = lvl + 1;
+            
+            // Добавляем +5 к базе. Благодаря твоим иксам (x2, x10) из веток, 
+            // эти +5 превратятся в +10, +50 и т.д. автоматически в формуле клика.
+            state.treeBonusCoins += 5; 
+            
+            updateUI();
+        } else {
+            alert("Недостаточно кликов! Нужно: " + formatNum(price));
+        }
+    } else {
+        alert("Уровни закончились! Добавь новые цены в массив plus5moneyCosts.");
+    }
+}
 </script>
 </body>
 </html>

@@ -115,11 +115,11 @@ let state = {
 
 // ТВОИ ЦЕНЫ И ОБНОВЛЕННЫЕ ЗНАЧЕНИЯ X1.5
 const x3Costs = [7500, 95e3, 6e5, 5e6, 35e6, 1.5e9, 22e9, 91e10];; // 5m 35m 150m 2.2b 91b
-const x5Costs = [65000000, 6500000000, 1e11, 17e12, 485e13];
-const x15Costs = [12e9, 45e10, 92e11]; // 12B и 450B
+const x5Costs = [65000000, 6500000000, 1e12, 17e13, 485e14];
+const x15Costs = [12e9, 45e12, 92e14, 92e15]; // 12B и 450B
 const superCosts = [200, 700, 3000, 7000, 16000, 40000, 140000, 370000, 650000, 1000000];
 const megaCosts = [200, 1000, 2000, 5000, 18000];
-const rebirthGoals = [100000, 16000000, 150000000, 82e7, 95e9, 11e11, 25e13, 63e14];
+const rebirthGoals = [100000, 16000000, 150000000, 82e7, 95e9, 11e13, 25e15, 63e18];
 
 let audioCtx = null, musicEnabled = false;
 // суммы чисел в игре после e идут 0 
@@ -171,7 +171,7 @@ function updateUI() {
     //Обновляет текущий уровень (от 0 до 5).
     //Условие if (state.megaLevel < 5): Если уровень меньше 5, код показывает цену следующего улучшения.
     //else (Блок MAX): Если ты купил все 5 уровней, цена меняется на текст "MAX", а кнопка становится серой (disabled = true), чтобы ты не тратил монеты впустую.
-    if(state.megaLevel < 5) document.getElementById('megaCost').innerText = formatNum(megaCosts[state.megaLevel]);
+    if(state.megaLevel < 5) document.getElementById('megaCost').innerText = formatNum(megaCosts[state.megaLevel]); //megaCosts.length
     else { document.getElementById('megaCost').innerText = "MAX"; document.getElementById('megaBtn').disabled = true; }
     // что то связано с коин шансом
     //Шанс выпадения монет (Удача) (строки 141–145)

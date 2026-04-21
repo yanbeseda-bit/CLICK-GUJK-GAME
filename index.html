@@ -114,7 +114,7 @@ let state = {
 };
 
 // ТВОИ ЦЕНЫ И ОБНОВЛЕННЫЕ ЗНАЧЕНИЯ X1.5
-const x3Costs = [7500, 95e3, 6e5, 5e6, 35e6, 1.5e9, 22e9, 91e10, 28e13, 15e14, 24e17, 35e19, 99e22, 1e24, 31e26];; // 5m 35m 150m 2.2b 91b
+const x3Costs = [7500, 95e3, 6e5, 5e6, 35e6, 1.5e9, 22e9, 91e10, 28e13, 15e14, 24e17, 35e19, 99e21, 1e24, 31e24, 66e26];; // 5m 35m 150m 2.2b 91b
 const x5Costs = [87000000, 65e9, 1e13, 17e14, 485e15, 65e17, 19e19, 23e21, 83e23, 51e26, 42e29, 77e33];
 const x15Costs = [12e13, 45e15, 92e17, 92e19, 19e22, 23e24, 46e26, 21e27, 82e28, 35e31]; // 12B и 450B
 const superCosts = [200, 700, 3000, 7000, 16000, 40000, 140000, 370000, 650000, 1000000];
@@ -126,8 +126,8 @@ let audioCtx = null, musicEnabled = false;
 function formatNum(num) {
     if (num >= 1e36) return (num / 1e36).toFixed(2) + "Ud"
     if (num >= 1e33) return (num / 1e33).toFixed(2) + "Dc"
-    if (num >= 1e30) return (num / 1e30).toFixed(2) + "Oc"
-    if (num >= 1e27) return (num / 1e27).toFixed(2) + "No"
+    if (num >= 1e30) return (num / 1e30).toFixed(2) + "No"
+    if (num >= 1e27) return (num / 1e27).toFixed(2) + "Oc"
     if (num >= 1e24) return (num / 1e24).toFixed(2) + "Sp"
     if (num >= 1e21) return (num / 1e21).toFixed(2) + "Sx"
     if (num >= 1e18) return (num / 1e18).toFixed(2) + "Qi"
@@ -259,7 +259,7 @@ function enterPromoCode() {
     
     if (code === "GUJK1228CV") { 
         state.money += 1e30; // 1 Триллион денег
-        alert("Бонус 1Oc денег зачислен!");
+        alert("Бонус 1No денег зачислен!");
     } 
     else if (code === "GUJK1228CV1") { 
         state.coins += 50000000; // 50 тысяч монет

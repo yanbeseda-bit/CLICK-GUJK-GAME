@@ -310,6 +310,34 @@ const levelGoals = [15, 20, 25, 35, 45, 60, 70, 85, 100, 105, 110, 115, 130, 140
 920, 1000, 1030, 1065, 1100, 1140, 1180, 1200, 1250, 1300, 1350, 1400, 1450, 1500, 1550, 1600, 1650, 1700, 1750, 1800, 1850, 1900, 1950, 2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000, 3100, 3200, 3500, 3800, 4000, //83 лвл
 4400, 4700, 5100, 5400, 5700, 6000, 6500, 7000, 7500, 8000, 8500, 9000, 9500, 10000, 10300, 10600, 10800, 11000, 11600, 12000, 13000, 14000, 15000, 16000, 17000, 18000, 19000, 20000, 21000, 22000, 23000, 24000, 25000, 26000, 27000, //118 лвл
 28000, 29000, 30000, 32000, 34000, 36000, 38000, 40000, 42000, 44000, 45000, 47000, 49000, 50000, 54000, 56000, 58000, 60000, 70000, 80000, 90000, 100000 ]; //140 лвл пока что макс
+const rebirthGoals = [...];
+const levelGoals = [...]; // Твой длинный список уровней
+
+// ВСТАВЛЯЙ СЮДА:
+function updateXP() {
+    let maxLvl = levelGoals.length;
+    let goal = (state.level <= maxLvl) ? levelGoals[state.level - 1] : levelGoals[maxLvl - 1];
+
+    if (state.xp >= goal) {
+        state.xp = 0;
+        state.level++;
+        if (state.level % 25 === 0) state.coins += 1;
+    }
+
+    let lvlEl = document.getElementById('lvlDisplay');
+    let xpEl = document.getElementById('xpDisplay');
+    let xpNextEl = document.getElementById('xpNextDisplay');
+    let barEl = document.getElementById('xpBar');
+
+    if(lvlEl) lvlEl.innerText = state.level;
+    if(xpEl) xpEl.innerText = formatNum(state.xp);
+    if(xpNextEl) xpNextEl.innerText = formatNum(goal);
+    
+    if(barEl) {
+        let percent = (state.xp / goal) * 100;
+        barEl.style.width = Math.min(percent, 100) + "%";
+    }
+}
 
 
 let audioCtx = null, musicEnabled = false;
@@ -622,33 +650,7 @@ function buyExtraUpgrade() {
 
 }
 // --- СИСТЕМА УРОВНЕЙ ---
-function updateXP() {
-    // 1. Считаем цель из списка levelGoals
-    let maxLvl = levelGoals.length;
-    let goal = (state.level <= maxLvl) ? levelGoals[state.level - 1] : levelGoals[maxLvl - 1];
 
-    // 2. Логика повышения уровня
-    if (state.xp >= goal) {
-        state.xp = 0;
-        state.level++;
-        if (state.level % 25 === 0) state.coins += 1;
-    }
-
-    // 3. Обновление интерфейса
-    let lvlEl = document.getElementById('lvlDisplay');
-    let xpEl = document.getElementById('xpDisplay');
-    let xpNextEl = document.getElementById('xpNextDisplay');
-    let barEl = document.getElementById('xpBar');
-
-    if(lvlEl) lvlEl.innerText = state.level;
-    if(xpEl) xpEl.innerText = formatNum(state.xp);
-    if(xpNextEl) xpNextEl.innerText = formatNum(goal);
-    
-    if(barEl) {
-        let percent = (state.xp / goal) * 100;
-        barEl.style.width = Math.min(percent, 100) + "%";
-    }
-}
 }
     }
     </script>

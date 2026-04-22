@@ -114,21 +114,50 @@ line { stroke: #1e293b; stroke-width: 4; transition: 0.5s; opacity: 0; }
     <button onclick="toggleMusic()" style="background:#334155; margin-top:20px;">🎵 Музыка: <span id="musStatus">ВЫКЛ</span></button>
 </div>
 <!-- снизу Это валюты которые есть в игре -->
+<!-- === ЦЕНТРАЛЬНАЯ ПАНЕЛЬ ИГРЫ === -->
 <div class="main-area">
+
+    <!-- БЛОК 1: ВАЛЮТЫ И БАЛАНС -->
     <div class="card" style="width: 320px;">
         <div>💰 Деньги: <span id="money" style="color:var(--accent)">0</span></div> 
         <div>🪙 Монеты: <span id="coins" style="color:var(--gold)">0</span></div>
         <div>🔥 Ребирты: <span id="rebirths" style="color:var(--purple)">0</span></div>
         <div>⭐ Поинты: <span id="points" style="color:var(--green)">0</span></div>
-        <div id="matterDisplay" style="display:none; color:var(--matter); margin-top:5px; font-weight:bold;">⚛️ Материя: <span id="matter">0</span></div>
+        <div id="matterDisplay" style="display:none; color:var(--matter); margin-top:5px; font-weight:bold;">
+            ⚛️ Материя: <span id="matter">0</span>
+        </div>
     </div>
-    <button onclick="openTree()" style="width: 220px; background: var(--purple); margin-bottom:10px">🕸️ Ветка ребиртов</button>
+
+    <!-- БЛОК 2: СИСТЕМА УРОВНЕЙ И ОПЫТА (НОВОЕ!) -->
+    <div class="card" style="width: 320px; margin-top: 10px; border: 1px solid #334155;">
+        <div style="display: flex; justify-content: space-between; font-weight: bold;">
+            <span>Уровень: <span id="lvlDisplay" style="color:var(--green)">1</span></span>
+            <span style="font-size: 12px; color: #94a3b8;">XP: <span id="xpDisplay">0</span> / <span id="xpNextDisplay">15</span></span>
+        </div>
+        <!-- Полоска опыта -->
+        <div style="width: 100%; height: 10px; background: #1e293b; border-radius: 5px; margin-top: 8px; overflow: hidden; border: 1px solid #1e293b;">
+            <div id="xpBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #3b82f6, #60a5fa); transition: 0.3s;"></div>
+        </div>
+    </div>
+
+    <!-- БЛОК 3: УПРАВЛЕНИЕ И КЛИК -->
+    <button onclick="openTree()" style="width: 220px; background: var(--purple); margin-top:15px; margin-bottom:10px">
+        🕸️ Ветка ребиртов
+    </button>
+
     <button class="bigClick" onclick="clickMoney(event)">КЛИК!</button>
+
+    <!-- БЛОК 4: РЕБИРТЫ -->
     <div class="card" style="margin-top: 20px; width: 250px;">
-        <h3>♻️ Ребирт</h3><p id="rebInfo">Нужно: 100K</p><button id="rebButton" onclick="rebirth()" style="background: var(--purple);">Сделать (0)</button>
+        <h3>♻️ Ребирт</h3>
+        <p id="rebInfo">Нужно: 100K</p>
+        <button id="rebButton" onclick="rebirth()" style="background: var(--purple);">Сделать (0)</button>
     </div>
-    <button onclick="enterPromoCode()" style="background: #334155; width: auto; font-size: 10px; margin-top: 5px;">Ввести код</button>
-    <button onclick="resetGame()" style="background: #ef4444; width: auto; font-size: 10px; margin-top: 20px;">СБРОСИТЬ ВСЁ</button>
+
+    <!-- БЛОК 5: ТЕХНИЧЕСКИЕ КНОПКИ -->
+    <button onclick="enterPromoCode()" style="background: #334155; width: auto; font-size: 10px; margin-top: 10px;">Ввести код</button>
+    <button onclick="resetGame()" style="background: #ef4444; width: auto; font-size: 10px; margin-top: 25px;">СБРОСИТЬ ВСЁ</button>
+
 </div>
 <!-- Магазин за клики улучшение -->
 <div class="side-panel right">
@@ -193,6 +222,10 @@ let state = {
     megaLevel: 0, autoLevel: 0, autoCost: 2000, x3Level: 0, x5Level: 0, x15Level: 0, superLevel: 0,
     coinChanceBase: 0.01, chanceUpgradeLevel: 0, treeX2: 1, treeBonusCoins: 0, 
     matterPerClick: 0.01, matterMultCoins: 1, autoPowerMult: 1, boughtNodes: []
+    // === НОВАЯ СИСТЕМА УРОВНЕЙ ===
+    level: 1,        // Текущий уровень
+    xp: 0,           // Текущий опыт
+    xpNext: 100      // Сколько нужно до следующего уровня (можешь менять)
 };
 
 // ТВОИ ЦЕНЫ И ОБНОВЛЕННЫЕ ЗНАЧЕНИЯ X1.5
@@ -202,6 +235,12 @@ const x15Costs = [12e13, 45e15, 92e17, 92e19, 19e22, 23e24, 46e26, 21e27, 82e28,
 const superCosts = [200, 700, 3000, 7000, 16000, 40000, 140000, 370000, 650000, 1000000];
 const megaCosts = [200, 1000, 2000, 5000, 18000];
 const rebirthGoals = [100000, 16000000, 870000000, 82e8, 95e12, 11e15, 25e18, 63e22, 2e24, 56e27, 12e30];
+// Сколько опыта нужно для каждого следующего уровня
+const levelGoals = [15, 20, 25, 35, 45, 60, 70, 85, 100, 105, 110, 115, 130, 140, 160, 170, 190, 195, 200, 205, 230, 240, 260, 270, 290, 330, 345, 360, 365, 390, 400, 410, 440, 470, 500, 530, 550, 600, 640, 700, 760, 790, 810, 860, //44 лвл
+920, 1000, 1030, 1065, 1100, 1140, 1180, 1200, 1250, 1300, 1350, 1400, 1450, 1500, 1550, 1600, 1650, 1700, 1750, 1800, 1850, 1900, 1950, 2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000, 3100, 3200, 3500, 3800, 4000, //83 лвл
+4400, 4700, 5100, 5400, 5700, 6000, 6500, 7000, 7500, 8000, 8500, 9000, 9500, 10000, 10300, 10600, 10800, 11000, 11600, 12000, 13000, 14000, 15000, 16000, 17000, 18000, 19000, 20000, 21000, 22000, 23000, 24000, 25000, 26000, 27000, //118 лвл
+28000, 29000, 30000, 32000, 34000, 36000, 38000, 40000, 42000, 44000, 45000, 47000, 49000, 50000, 54000, 56000, 58000, 60000, 70000, 80000, 90000, 100000 ]; //140 лвл пока что макс
+
 
 let audioCtx = null, musicEnabled = false;
 // суммы чисел в игре после e идут 0 
@@ -246,7 +285,9 @@ function getTotalClick() {
     let base = 1 + state.moneyUpgrade + (state.coinUpgrade * 2) + (state.megaLevel * 10);
     let mult = Math.pow(3, state.x3Level) * Math.pow(5, state.x5Level) * Math.pow(1.5, state.x15Level) * Math.pow(2, state.rebirths) * state.treeX2 * Math.pow(2, state.superLevel);
     if (state.superLevel > 0 && Math.random() < 0.03) return (base * mult) * 10;
-    return base * mult;
+    let levelBonus = 1 + (state.level * 0.02); // Это те самые +2% за каждый уровень
+return base * mult * levelBonus;
+
 }
 // материя?
 function processRewards() {
@@ -256,6 +297,10 @@ function processRewards() {
 // анимация клика?
 function clickMoney(e) {
     if (isResetting) return;
+    // === ДОБАВЛЯЕМ ЭТИ ДВЕ СТРОКИ ===
+    state.xp += 1; 
+    updateXP(); 
+    // ===============================
     let p = getTotalClick(); state.money += p; processRewards();
     let anim = document.createElement('div'); anim.className = 'click-anim'; anim.innerText = '+' + formatNum(p);
     anim.style.left = e.pageX + 'px'; anim.style.top = e.pageY + 'px';
@@ -384,6 +429,36 @@ function playTune() { if (!musicEnabled || isResetting) return; let osc = audioC
 
 autoInterval = setInterval(() => { if(state && state.autoLevel>0 && !isResetting){ state.money += (state.autoLevel * getTotalClick() * 0.1 * state.autoPowerMult); processRewards(); updateUI(); }}, 1000);
 window.onload = function() { let s = localStorage.getItem('click_v12'); if(s) { state = {...state, ...JSON.parse(s)}; updateUI(); } }
+    function updateXP()
+    {
+    // Вычисляем цель опыта по твоему списку levelGoals
+    let goal = (state.level <= levelGoals.length) ? levelGoals[state.level - 1] : levelGoals[levelGoals.length - 1];
+
+    // Если набрали опыт — повышаем уровень
+    if (state.xp >= goal) {
+        state.xp = 0;
+        state.level++;
+        // Бонус: монета за каждые 25 уровней
+        if (state.level % 25 === 0) state.coins += 1;
+    }
+
+    // Обновляем визуальные элементы
+    let lvlEl = document.getElementById('lvlDisplay');
+    let xpEl = document.getElementById('xpDisplay');
+    let xpNextEl = document.getElementById('xpNextDisplay');
+    let barEl = document.getElementById('xpBar');
+
+    if(lvlEl) lvlEl.innerText = state.level;
+    if(xpEl) xpEl.innerText = formatNum(state.xp);
+    if(xpNextEl) xpNextEl.innerText = formatNum(goal);
+    
+    // Двигаем полоску прогресса
+    if(barEl) {
+        let percent = (state.xp / goal) * 100;
+        barEl.style.width = Math.min(percent, 100) + "%";
+    }
+}
+
 </script>
 </body>
 </html>

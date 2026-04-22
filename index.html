@@ -419,30 +419,69 @@ function enterPromoCode() {
     
     updateUI(); 
 }
-function resetGame() { if(confirm("ВЫ УВЕРЕНЫ?")) { isResetting = true; clearInterval(autoInterval); localStorage.clear(); location.reload(); } }
-    // открытые и закрытия дерева 
+function resetGame() { 
+    if(confirm("ВЫ УВЕРЕНЫ?")) { 
+        isResetting = true; 
+        clearInterval(autoInterval); 
+        localStorage.clear(); 
+        location.reload(); 
+    } 
+}
+
+// Открытие и закрытие дерева 
 function openTree() { document.getElementById('treeModal').style.display='block'; }
 function closeTree() { document.getElementById('treeModal').style.display='none'; }
-// музыка
-function toggleMusic() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); musicEnabled = !musicEnabled; document.getElementById('musStatus').innerText = musicEnabled ? "ВКЛ" : "ВЫКЛ"; if (musicEnabled) playTune(); }
-function playTune() { if (!musicEnabled || isResetting) return; let osc = audioCtx.createOscillator(), gain = audioCtx.createGain(); osc.type = 'triangle'; osc.connect(gain); gain.connect(audioCtx.destination); gain.gain.setValueAtTime(0.03, audioCtx.currentTime); osc.start(); osc.stop(audioCtx.currentTime + 3); setTimeout(playTune, 3200); }
 
-autoInterval = setInterval(() => { if(state && state.autoLevel>0 && !isResetting){ state.money += (state.autoLevel * getTotalClick() * 0.1 * state.autoPowerMult); processRewards(); updateUI(); }}, 1000);
-window.onload = function() { let s = localStorage.getItem('click_v12'); if(s) { state = {...state, ...JSON.parse(s)}; updateUI(); } }
-    function updateXP()
-    {
-    // Вычисляем цель опыта по твоему списку levelGoals
-    let goal = (state.level <= levelGoals.length) ? levelGoals[state.level - 1] : levelGoals[levelGoals.length - 1];
+// Музыка
+function toggleMusic() { 
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); 
+    musicEnabled = !musicEnabled; 
+    document.getElementById('musStatus').innerText = musicEnabled ? "ВКЛ" : "ВЫКЛ"; 
+    if (musicEnabled) playTune(); 
+}
 
-    // Если набрали опыт — повышаем уровень
+function playTune() { 
+    if (!musicEnabled || isResetting) return; 
+    let osc = audioCtx.createOscillator(), gain = audioCtx.createGain(); 
+    osc.type = 'triangle'; osc.connect(gain); gain.connect(audioCtx.destination); 
+    gain.gain.setValueAtTime(0.03, audioCtx.currentTime); 
+    osc.start(); osc.stop(audioCtx.currentTime + 3); 
+    setTimeout(playTune, 3200); 
+}
+
+// Автокликер
+autoInterval = setInterval(() => { 
+    if(state && state.autoLevel > 0 && !isResetting){ 
+        state.money += (state.autoLevel * getTotalClick() * 0.1 * state.autoPowerMult); 
+        processRewards(); 
+        updateUI(); 
+    }
+}, 1000);
+
+// Загрузка игры
+window.onload = function() { 
+    let s = localStorage.getItem('click_v12'); 
+    if(s) { 
+        state = {...state, ...JSON.parse(s)}; 
+    }
+    updateUI(); 
+    updateXP(); // Чтобы уровень обновился при входе
+};
+
+// --- СИСТЕМА УРОВНЕЙ ---
+function updateXP() {
+    // 1. Считаем цель из списка levelGoals
+    let maxLvl = levelGoals.length;
+    let goal = (state.level <= maxLvl) ? levelGoals[state.level - 1] : levelGoals[maxLvl - 1];
+
+    // 2. Логика повышения уровня
     if (state.xp >= goal) {
         state.xp = 0;
         state.level++;
-        // Бонус: монета за каждые 25 уровней
         if (state.level % 25 === 0) state.coins += 1;
     }
 
-    // Обновляем визуальные элементы
+    // 3. Обновление интерфейса
     let lvlEl = document.getElementById('lvlDisplay');
     let xpEl = document.getElementById('xpDisplay');
     let xpNextEl = document.getElementById('xpNextDisplay');
@@ -452,16 +491,15 @@ window.onload = function() { let s = localStorage.getItem('click_v12'); if(s) { 
     if(xpEl) xpEl.innerText = formatNum(state.xp);
     if(xpNextEl) xpNextEl.innerText = formatNum(goal);
     
-    // Двигаем полоску прогресса
     if(barEl) {
         let percent = (state.xp / goal) * 100;
         barEl.style.width = Math.min(percent, 100) + "%";
     }
 }
-
 </script>
 </body>
 </html>
+
  <!-- ШАБЛОН НОВОГО УЛУЧШЕНИЯ 
 <div class="card">
     <h3>Название</h3>

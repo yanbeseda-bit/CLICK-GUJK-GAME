@@ -10,7 +10,11 @@
 body { font-family: 'Segoe UI', Arial; background: var(--bg); color: white; margin: 0; overflow: hidden; display: flex; height: 100vh; width: 100vw; }
 
 
-/* === 2. МАКЕТ ПАНЕЛЕЙ И КАРТОЧЕК === */
+/* === 2. МАКЕТ ПАНЕЛЕЙ И КАРТОЧЕК Карточки (.card)
+Это блоки внутри боковых панелей. В них обычно пишут название улучшения, его цену и кнопку «Купить».
+background: var(--card): Использует цвет, заданный в настройках темы.
+box-shadow: Добавляет тень, чтобы карточка казалась объемной и «приподнятой» над фоном.
+border-radius: 15px: Делает аккуратные закругленные углы. === */
 .side-panel { width: 280px; background: rgba(17, 24, 39, 0.98); padding: 20px; overflow-y: auto; border-right: 1px solid #1e293b; z-index: 20; position: relative; }
 
 .side-panel.right { border-right: none; border-left: 1px solid #1e293b; }

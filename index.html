@@ -476,7 +476,7 @@ function updateUI() {
     });
     // сохранение игры
     localStorage.setItem('click_v12', JSON.stringify(state));
-
+}
   // запреты 
 function buyMatterNode(id) {
     let cost = (id===10) ? 12 : (id===11 ? 14 : 80);
@@ -649,7 +649,8 @@ function updateXP() {
         barEl.style.width = Math.min(percent, 100) + "%";
     }
 }
-</script>
+}
+    </script>
 </body>
 </html>
 

@@ -288,7 +288,7 @@ let state = {
     level: 1,        // Текущий уровень
     xp: 0,           // Текущий опыт
     xpNext: 100,      // Сколько нужно до следующего уровня (можешь менять)
-        xpNext: 100, // Твой старый код
+         // Твой старый код
 
     // === НОВОЕ УЛУЧШЕНИЕ: ТРИПЛ КИЛЛ ===
     extraLevel: 0,        // Текущий уровень улучшения в магазине
@@ -374,6 +374,8 @@ function clickMoney(e) {
     if (isResetting) return;
     // === ДОБАВЛЯЕМ ЭТИ ДВЕ СТРОКИ ===
     state.xp += 1; 
+    
+
     updateXP(); 
     // ===============================
     let p = getTotalClick(); state.money += p; processRewards();
@@ -400,6 +402,30 @@ function updateUI() {
     //Обновляет текущий уровень (от 0 до 5).
     //Условие if (state.megaLevel < 5): Если уровень меньше 5, код показывает цену следующего улучшения.
     //else (Блок MAX): Если ты купил все 5 уровней, цена меняется на текст "MAX", а кнопка становится серой (disabled = true), чтобы ты не тратил монеты впустую.
+    }
+    function rebirth() {
+        
+    let goal = (typeof rebirthGoals !== 'undefined' && rebirthGoals[state.rebirths]) 
+               ? rebirthGoals[state.rebirths] 
+               : 100000;
+
+    if (state.money >= goal) {
+        state.money = 0;
+        state.moneyUpgrade = 0;
+        state.moneyUpgradeCost = 30;
+        state.autoLevel = 0;
+        state.autoCost = 2000;
+        state.x3Level = 0;
+        state.x5Level = 0;
+        state.rebirths++;
+        state.points++; 
+        updateUI();
+        alert("Ребирт выполнен! Получен 1 ⭐");
+    } else {
+        alert("Нужно больше денег!");
+    }
+}
+
     if(state.megaLevel < 5) document.getElementById('megaCost').innerText = formatNum(megaCosts[state.megaLevel]); //megaCosts.length
     else { document.getElementById('megaCost').innerText = "MAX"; document.getElementById('megaBtn').disabled = true; }
         // Обновление данных Мастера Клика

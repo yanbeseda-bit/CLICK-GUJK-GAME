@@ -72,7 +72,7 @@ line { stroke: #1e293b; stroke-width: 4; transition: 0.5s; opacity: 0; }
 
 .active-matter-line { stroke: var(--matter); filter: drop-shadow(0 0 5px var(--matter)); opacity: 1; }
 /* === клик анимация ===*/
-.click-anim { position: absolute; pointer-events: none; color: #60a5fa; font-weight: bold; font-size: 26px; animation: fly 0.7s forwards; text-shadow: 0 0 5px black; z-index: 100; }
+.click-anim { position: absolute; pointer-events: none; color: #60a5fa; font-weight: bold; font-size: 26px; animation: fly 0.85s forwards; text-shadow: 0 0 5px black; z-index: 100; }
 
 @keyframes fly { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-130px); opacity: 0; } }
 </style>
@@ -81,10 +81,36 @@ line { stroke: #1e293b; stroke-width: 4; transition: 0.5s; opacity: 0; }
 <!-- снизу магазин за монеты каждая строка новое улучшение -->
 <div class="side-panel">
     <h2 style="text-align:center">🪙 Монеты</h2>
-    <div class="card"><h3>Улучшение клика</h3><p>+2 к базе</p><p>Цена: <span id="coinUpgradeCost">3</span> 🪙</p><button onclick="buyCoinUpgrade()">Купить</button></div>
-    <div class="card"><h3 style="color:var(--gold)">⚡ Мега Клик</h3><p>+10 к базе</p><p>Уровень: <span id="megaLvl">0</span>/5</p><p>Цена: <span id="megaCost">200</span> 🪙</p><button id="megaBtn" onclick="buyMegaClick()">Улучшить</button></div>
-    <div class="card"><h3>Удача</h3><p>Шанс: <span id="curChanceText">1%</span></p><p>Цена: <span id="chanceCost">5</span> 🪙</p><button id="chanceBtn" onclick="buyChanceUpgrade()">Улучшить</button></div>
-    <div id="secretShop" style="display: none;"><div class="card" style="border: 1px solid var(--gold);"><h3 style="color:var(--gold);">🌟 Супер Клик</h3><p>Уровень: <span id="superLvl">0</span>/10</p><p>Цена: <span id="superCost">200</span></p><button id="superBtn" onclick="buySuperClick()" style="background:var(--gold);color:black;">Купить</button></div></div>
+    <!-- Блок 1 (Строки 84-89): Первое улучшение. Это «Улучшение клика»... -->
+    <div class="card">
+        <h3>Улучшение клика</h3>
+        <p>+2 к базе</p>
+        <p>Цена: <span id="coinUpgradeCost">3</span> 🪙</p>
+        <button onclick="buyCoinUpgrade()">Купить</button>
+    </div>
+    <!-- 2. ВТОРОЕ УЛУЧШЕНИЕ: Золотой Мега Клик (Лимит 5 уровней) -->
+    <div class="card">
+        <h3 style="color:var(--gold)">⚡ Мега Клик</h3>
+        <p>+10 к базе</p>
+        <p>Уровень: <span id="megaLvl">0</span>/5</p>
+        <p>Цена: <span id="megaCost">200</span> 🪙</p>
+        <button id="megaBtn" onclick="buyMegaClick()">Улучшить</button>
+    </div>
+    <!-- 3. ТРЕТЬЕ УЛУЧШЕНИЕ: Шанс на удачу (Криты) -->
+    <div class="card">
+        <h3>Удача</h3><p>Шанс: <span id="curChanceText">1%</span></p>
+        <p>Цена: <span id="chanceCost">5</span> 🪙</p>
+        <button id="chanceBtn" onclick="buyChanceUpgrade()">Улучшить</button>
+    </div>
+    <!-- 4. СЕКРЕТНЫЙ МАГАЗИН: Открывается через дерево навыков -->
+    <div id="secretShop" style="display: none;">
+        <!-- ПЕРВОЕ секретное улучшение: Супер Клик -->
+        <div class="card" style="border: 1px solid var(--gold);">
+            <h3 style="color:var(--gold);">🌟 Супер Клик</h3>
+            <p>Уровень: <span id="superLvl">0</span>/10</p>
+            <p>Цена: <span id="superCost">200</span></p>
+            <button id="superBtn" onclick="buySuperClick()" style="background:var(--gold);color:black;">Купить</button>
+        </div></div>
     <button onclick="toggleMusic()" style="background:#334155; margin-top:20px;">🎵 Музыка: <span id="musStatus">ВЫКЛ</span></button>
 </div>
 <!-- снизу Это валюты которые есть в игре -->
@@ -107,11 +133,33 @@ line { stroke: #1e293b; stroke-width: 4; transition: 0.5s; opacity: 0; }
 <!-- Магазин за клики улучшение -->
 <div class="side-panel right">
     <h2 style="text-align:center">💸 Магазин</h2>
-    <div class="card"><h3>Сила клика</h3><p>Цена: <span id="moneyUpgradeCost">30</span></p><button onclick="buyMoneyUpgrade()">Купить</button></div>
-    <div class="card"><h3>Улучшение x3</h3><p id="x3Info">Цена: 7.5K</p><button id="x3Btn" onclick="buyX3()">Купить</button></div>
-    <div id="x5Shop" style="display: none;"><div class="card" style="border: 1px solid var(--accent);"><h3>🔥 Супер x5</h3><p id="x5Info">Цена: 65M</p><button id="x5Btn" onclick="buyX5()">Купить</button></div></div>
-    <div id="x15Shop" style="display: none;"><div class="card" style="border: 1px solid #f87171;"><h3>🌌 Ультра x1.5</h3><p id="x15Info">Цена: 12B</p><button id="x15Btn" onclick="buyX15()">Купить</button></div></div>
-    <div class="card"><h3>Автокликер</h3><p>Цена: <span id="autoCost">2K</span></p><button onclick="buyAuto()">Купить</button></div>
+    <div class="card">
+        <h3>Сила клика</h3>
+        <p>Цена: <span id="moneyUpgradeCost">30</span>
+        </p><button onclick="buyMoneyUpgrade()">Купить</button>
+    </div>
+    <div class="card">
+        <h3>Улучшение x3</h3>
+        <p id="x3Info">Цена: 7.5K</p>
+        <button id="x3Btn" onclick="buyX3()">Купить</button>
+    </div>
+    <div id="x5Shop" style="display: none;"><div class="card" style="border: 1px solid var(--accent);">
+        <h3>🔥 Супер x5</h3>
+        <p id="x5Info">Цена: 65M</p>
+        <button id="x5Btn" onclick="buyX5()">Купить</button>
+    </div>
+     </div>
+    <div id="x15Shop" style="display: none;"><div class="card" style="border: 1px solid #f87171;">
+        <h3>🌌 Ультра x1.5</h3>
+        <p id="x15Info">Цена: 12B</p>
+        <button id="x15Btn" onclick="buyX15()">Купить</button>
+    </div>
+    </div>
+    <div class="card">
+        <h3>Автокликер</h3>
+        <p>Цена: <span id="autoCost">2K</span>
+        </p><button onclick="buyAuto()">Купить</button>
+    </div>
 </div>
 <!-- снизу кнопка закрытия дерева  -->
 <div id="treeModal"><button class="close-tree" onclick="closeTree()">Закрыть [X]</button>
@@ -158,6 +206,27 @@ const rebirthGoals = [100000, 16000000, 870000000, 82e8, 95e12, 11e15, 25e18, 63
 let audioCtx = null, musicEnabled = false;
 // суммы чисел в игре после e идут 0 
 function formatNum(num) {
+    if (num >= 1e99) return (num / 1e99).toFixed(2) + "Tg"
+    if (num >= 1e96) return (num / 1e96).toFixed(2) + "NUvG"
+    if (num >= 1e93) return (num / 1e93).toFixed(2) + "NoVg"
+    if (num >= 1e90) return (num / 1e90).toFixed(2) + "OcVg"
+    if (num >= 1e87) return (num / 1e87).toFixed(2) + "SpVg"
+    if (num >= 1e84) return (num / 1e84).toFixed(2) + "SxVg"
+    if (num >= 1e81) return (num / 1e81).toFixed(2) + "QiVg"
+    if (num >= 1e78) return (num / 1e78).toFixed(2) + "QaVg"
+    if (num >= 1e75) return (num / 1e75).toFixed(2) + "TVg"
+    if (num >= 1e72) return (num / 1e72).toFixed(2) + "DVg"
+    if (num >= 1e69) return (num / 1e69).toFixed(2) + "UVg"
+    if (num >= 1e66) return (num / 1e66).toFixed(2) + "Vg"
+    if (num >= 1e63) return (num / 1e63).toFixed(2) + "NoDc"
+    if (num >= 1e60) return (num / 1e60).toFixed(2) + "OcDc"
+    if (num >= 1e57) return (num / 1e57).toFixed(2) + "SpDc"
+    if (num >= 1e54) return (num / 1e54).toFixed(2) + "SxDc"
+    if (num >= 1e51) return (num / 1e51).toFixed(2) + "QiDc"
+    if (num >= 1e48) return (num / 1e48).toFixed(2) + "QaDc"
+    if (num >= 1e45) return (num / 1e45).toFixed(2) + "TDc"
+    if (num >= 1e42) return (num / 1e42).toFixed(2) + "UDc"
+    if (num >= 1e39) return (num / 1e39).toFixed(2) + "DDc"
     if (num >= 1e36) return (num / 1e36).toFixed(2) + "Ud"
     if (num >= 1e33) return (num / 1e33).toFixed(2) + "Dc"
     if (num >= 1e30) return (num / 1e30).toFixed(2) + "No"
@@ -318,3 +387,10 @@ window.onload = function() { let s = localStorage.getItem('click_v12'); if(s) { 
 </script>
 </body>
 </html>
+ <!-- ШАБЛОН НОВОГО УЛУЧШЕНИЯ 
+<div class="card">
+    <h3>Название</h3>
+    <p>Эффект: +10%</p>
+    <p>Цена: <span id="newCost">100</span> 🪙</p>
+    <button onclick="newFunction()">Купить</button>
+</div> -->

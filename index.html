@@ -50,9 +50,47 @@ width: 1200px; height: 800px; — задает жесткие размеры р�
 
 #treeViewport { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
 
-#treeContainer { position: relative; width: 1200px; height: 800px; }
+#treeContainer { 
+    position: relative; 
+    width: 1200px; 
+    height: 800px; 
+}
 
-.node { position: absolute; width: 140px; height: 140px; background: #1e293b; border: 3px solid #334155; border-radius: 50%; text-align: center; cursor: pointer; transform: translate(-50%, -50%); transition: 0.3s; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px; box-sizing: border-box; font-size: 10px; z-index: 5; }
+.node { 
+    position: absolute; 
+    width: 140px; 
+    height: 140px; 
+    background: #1e293b; 
+    border: 3px solid #334155; 
+    border-radius: 50%; 
+    text-align: center; 
+    cursor: pointer; 
+    transform: translate(-50%, -50%); 
+    transition: 0.3s; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center; 
+    padding: 10px; 
+    box-sizing: border-box; 
+    font-size: 10px; 
+    z-index: 5; 
+}
+
+/* Эффект для кнопки "Трипл килл" (оранжевое свечение) */
+.node.triple-kill {
+    border-color: #f97316;
+    color: #fdba74;
+}
+
+/* Когда Трипл килл куплен — он горит золотым */
+.node.triple-kill.bought {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    border-color: #fef3c7;
+    box-shadow: 0 0 40px rgba(251, 191, 36, 0.6);
+    color: black;
+}
+
 
 .node.bought { background: var(--purple); border-color: #c084fc; box-shadow: 0 0 30px rgba(168, 85, 247, 0.5); }
 
@@ -189,6 +227,16 @@ line { stroke: #1e293b; stroke-width: 4; transition: 0.5s; opacity: 0; }
         <p>Цена: <span id="autoCost">2K</span>
         </p><button onclick="buyAuto()">Купить</button>
     </div>
+    <!-- Скрытое улучшение: Мастер Клика -->
+<div id="extraUpgradeShop" style="display: none;">
+    <div class="card" style="border: 1px solid var(--purple);">
+        <h3>🚀 Мастер Клика</h3>
+        <p>+3 к силе клика</p>
+        <p>Цена: <span id="extraCostText">70M</span></p>
+        <button onclick="buyExtraUpgrade()">Купить</button>
+    </div>
+</div>
+
 </div>
 <!-- снизу кнопка закрытия дерева  -->
 <div id="treeModal"><button class="close-tree" onclick="closeTree()">Закрыть [X]</button>
@@ -196,15 +244,29 @@ line { stroke: #1e293b; stroke-width: 4; transition: 0.5s; opacity: 0; }
         <line id="l1" x1="400" y1="300" x2="600" y2="300" />
         <line id="l2" x1="400" y1="300" x2="400" y2="500" />
         <line id="l3" x1="400" y1="300" x2="200" y2="300" />
+        <line id="l4" x1="400" y1="500" x2="400" y2="700" style="opacity: 0; transition: 0.5s;" />
         <line id="ml1" x1="200" y1="300" x2="100" y2="200" />
         <line id="ml2" x1="100" y1="200" x2="100" y2="50" />
         <line id="ml3" x1="100" y1="200" x2="250" y2="100" />
     </svg><div id="node0" class="node" style="left: 400px; top: 300px;" onclick="buyTreeNode(0)">
     <b>Центр</b><br>Сила x2, +1 мон.<br>1 ⭐</div>
-        <div id="node1"class="node" style="left: 600px; top: 300px;" onclick="buyTreeNode(1)">
-            <b>Удача</b><br>Магазин монет<br>1 ⭐</div>
-        <div id="node2" class="node" style="left: 400px; top: 500px;"
-            onclick="buyTreeNode(2)"><b>Мощь</b><br>Открыть x5<br>1 ⭐</div>
+            <!-- Узел 1: Удача -->
+    <div id="node1" class="node" style="left: 600px; top: 300px;" onclick="buyTreeNode(1)">
+        <b>Удача</b><br>Магазин монет<br>1 ⭐
+    </div>
+
+    <!-- Узел 2: Мощь -->
+    <div id="node2" class="node" style="left: 400px; top: 500px;" onclick="buyTreeNode(2)">
+        <b>Мощь</b><br>Открыть x5<br>1 ⭐
+    </div>
+
+    <!-- Узел 4: Трипл килл -->
+    <div id="node4" class="node triple-kill" style="left: 400px; top: 700px; display: none;" onclick="buyTreeNode(4)">
+        <b style="font-size: 14px;">🔥 Трипл килл</b><br>
+        Открыть +3 улучшение<br>
+        <b style="color:var(--gold)">1 ⭐</b>
+    </div>
+
         <div id="node3" class="node" style="left: 200px; top: 300px;" onclick="buyTreeNode(3)"><b>Материя</b>
                 <br>+0.01 мат/клик<br>+2 монеты<br>1 ⭐</div>
         <div id="node10" class="node matter-node" style="left: 100px; top: 200px; display:none" onclick="buyMatterNode(10)"><b>Синтез</b><br>x2 мон.,
@@ -226,6 +288,14 @@ let state = {
     level: 1,        // Текущий уровень
     xp: 0,           // Текущий опыт
     xpNext: 100,      // Сколько нужно до следующего уровня (можешь менять)
+        xpNext: 100, // Твой старый код
+
+    // === НОВОЕ УЛУЧШЕНИЕ: ТРИПЛ КИЛЛ ===
+    extraLevel: 0,        // Текущий уровень улучшения в магазине
+    extraCost: 70000000,  // Начальная цена: 70 миллионов
+    isExtraUnlocked: false // Флаг: куплено ли оно в дереве
+
+
 };
 
 // ТВОИ ЦЕНЫ И ОБНОВЛЕННЫЕ ЗНАЧЕНИЯ X1.5
@@ -282,7 +352,8 @@ function formatNum(num) {
 }
 // клик и мое умножение 
 function getTotalClick() {
-    let base = 1 + state.moneyUpgrade + (state.coinUpgrade * 2) + (state.megaLevel * 10);
+    let base = 1 + state.moneyUpgrade + (state.coinUpgrade * 2) + (state.megaLevel * 10) + (state.extraLevel * 3);
+
     let mult = Math.pow(3, state.x3Level) * Math.pow(5, state.x5Level) * Math.pow(1.5, state.x15Level) * Math.pow(2, state.rebirths) * state.treeX2 * Math.pow(2, state.superLevel);
     
     if (state.superLevel > 0 && Math.random() < 0.03) return (base * mult) * 10;
@@ -331,6 +402,12 @@ function updateUI() {
     //else (Блок MAX): Если ты купил все 5 уровней, цена меняется на текст "MAX", а кнопка становится серой (disabled = true), чтобы ты не тратил монеты впустую.
     if(state.megaLevel < 5) document.getElementById('megaCost').innerText = formatNum(megaCosts[state.megaLevel]); //megaCosts.length
     else { document.getElementById('megaCost').innerText = "MAX"; document.getElementById('megaBtn').disabled = true; }
+        // Обновление данных Мастера Клика
+    let extraCostEl = document.getElementById('extraCostText');
+    let extraLvlEl = document.getElementById('extraLvl');
+    if (extraCostEl) extraCostEl.innerText = formatNum(state.extraCost);
+    if (extraLvlEl) extraLvlEl.innerText = state.extraLevel;
+
     // что то связано с коин шансом
     //Шанс выпадения монет (Удача) (строки 141–145)
     //curChanceText: Код переводит математическое число (например, 0.03) в понятные проценты (3%) и дописывает знак %.
@@ -403,8 +480,44 @@ function buyX5() { if(state.x5Level < x5Costs.length && state.money >= x5Costs[s
 function buyX15() { if(state.x15Level < x15Costs.length && state.money >= x15Costs[state.x15Level]){ state.money -= x15Costs[state.x15Level]; state.x15Level++; updateUI(); } }
 function buySuperClick() { if(state.coins>=superCosts[state.superLevel] && state.superLevel < 10){ state.coins-=superCosts[state.superLevel]; state.superLevel++; updateUI(); } }
                // СНАЧАЛА ЦЕНТР запрещает покупать другое пока не купить это
-function buyTreeNode(id) { if (id !== 0 && !state.boughtNodes.includes(0)) return alert("Сначала Центр!"); if (state.points >= 1 && !state.boughtNodes.includes(id)) { state.points--; state.boughtNodes.push(id); if(id===0) { state.treeX2=2; state.treeBonusCoins+=1; } if(id===1) document.getElementById('secretShop').style.display='block'; if(id===2) document.getElementById('x5Shop').style.display='block'; if(id===3) state.treeBonusCoins+=2; updateUI(); }}
-function rebirth() { let goal = rebirthGoals[state.rebirths] || 10000000000000; if(state.money >= goal) { state.money = 0; state.moneyUpgrade = 0; state.moneyUpgradeCost = 30; state.autoLevel = 0; state.autoCost = 2000; state.x3Level = 0; state.x5Level = 0; state.rebirths++; state.points++; updateUI(); } }
+function buyTreeNode(id) {
+    // 1. Проверка: куплен ли Центр
+    if (id !== 0 && !state.boughtNodes.includes(0)) {
+        return alert("Сначала Центр!");
+    }
+
+    // 2. Если есть поинты и узел еще не куплен
+    if (state.points >= 1 && !state.boughtNodes.includes(id)) {
+        state.points--;
+        state.boughtNodes.push(id);
+
+        // --- ЛОГИКА КАЖДОГО УЗЛА ---
+        if (id === 0) { 
+            state.treeX2 = 2; 
+            state.treeBonusCoins += 1; 
+        }
+        if (id === 1) document.getElementById('secretShop').style.display = 'block';
+        if (id === 2) document.getElementById('x5Shop').style.display = 'block';
+        if (id === 3) state.treeBonusCoins += 2;
+
+        // НОВОЕ: Если купили Мощь (id 2), открываем Трипл килл в дереве
+        if (id === 2) {
+            let n4 = document.getElementById('node4');
+            let l4 = document.getElementById('l4');
+            if (n4) n4.style.display = 'flex';
+            if (l4) l4.style.opacity = '1';
+        }
+
+        // НОВОЕ: Если купили Трипл килл (id 4), открываем его в магазине
+        if (id === 4) {
+            let extraShop = document.getElementById('extraUpgradeShop');
+            if (extraShop) extraShop.style.display = 'block';
+        }
+
+        updateUI();
+    }
+}
+
      // админ код
 function enterPromoCode() {
     let code = prompt("Введите код:"); 
@@ -471,6 +584,16 @@ window.onload = function() {
     updateUI(); 
     updateXP(); // Чтобы уровень обновился при входе
 };
+function buyExtraUpgrade() {
+    if (state.money >= state.extraCost) {
+        state.money -= state.extraCost;
+        state.extraLevel++;
+        state.extraCost *= 2; 
+        updateUI();
+    } else {
+        alert("Недостаточно денег для Мастера Клика!");
+    }
+}
 
 // --- СИСТЕМА УРОВНЕЙ ---
 function updateXP() {

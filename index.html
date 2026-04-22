@@ -275,6 +275,7 @@ line { stroke: #1e293b; stroke-width: 4; transition: 0.5s; opacity: 0; }
                  <b>Поток</b><br>+0.05 мат/клик<br>14 ⚛️</div>
         <div id="node12" class="node matter-node" style="left: 250px; top: 100px; display:none" onclick="buyMatterNode(12)">
                 <b>Разрыв</b><br>x2 Клик + Магаз<br>80 ⚛️</div></div></div></div>
+
 <!-- Зброс всего? -->
 <script>
 let autoInterval = null, isResetting = false;
@@ -554,13 +555,14 @@ function buyTreeNode(id) {
         if (id === 2) document.getElementById('x5Shop').style.display = 'block';
         if (id === 3) state.treeBonusCoins += 2;
 
-        // НОВОЕ: Если купили Мощь (id 2), открываем Трипл килл в дереве
-        if (id === 2) {
+                // НОВОЕ: Если купили Мощь (id 2), открываем Трипл килл в дереве
+                       if (id === 2) {
             let n4 = document.getElementById('node4');
-            let l4 = document.getElementById('l4');
+            let line4 = document.getElementById('14'); 
             if (n4) n4.style.display = 'flex';
-            if (l4) l4.style.opacity = '1';
+            if (line4) line4.style.opacity = '1';
         }
+ 
 
         // НОВОЕ: Если купили Трипл килл (id 4), открываем его в магазине
         if (id === 4) {

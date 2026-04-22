@@ -20,7 +20,7 @@ body { font-family: 'Segoe UI', Arial; background: var(--bg); color: white; marg
 .card { background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); text-align: center; border: 1px solid #1e293b; width: 100%; box-sizing: border-box; }
 
 
-/* === 3. ОФОРМЛЕНИЕ КНОПОК === */
+/* === 3. ОФОРМЛЕНИЕ КНОПОК Эти строки отвечают за то, как выглядят и «чувствуются» при нажатии все кнопки в вашей игре, а также за внешний вид главной кнопки клика. === */
 button { background: linear-gradient(135deg, var(--green), #16a34a); border: none; color: white; padding: 12px; border-radius: 10px; cursor: pointer; transition: 0.2s; font-weight: bold; width: 100%; margin-top: 5px; position: relative; z-index: 30; }
 
 button:hover { transform: scale(1.03); filter: brightness(1.1); }
@@ -31,7 +31,16 @@ button:disabled { filter: grayscale(1); opacity: 0.5; cursor: not-allowed; }
 
 .bigClick { font-size: 35px; padding: 40px 80px; border-radius: 30px; background: linear-gradient(135deg, #3b82f6, #2563eb); width: auto; box-shadow: 0 0 30px rgba(59, 130, 246, 0.4); margin-top: 10px; }
 
-
+/*#treeModal: Это сам «слой» модалки.
+display: none; — по умолчанию скрыто.
+position: fixed; inset: 0; — растягивается на весь экран и фиксируется при прокрутке.
+background: rgba(0,0,0,0.98); — почти полностью черный, едва прозрачный фон.
+z-index: 1000; — перекрывает все остальные элементы на странице.
+#treeViewport: Оболочка, которая отвечает за выравнивание.
+display: flex; align-items: center; justify-content: center; — центрирует содержимое строго посередине экрана.
+overflow: hidden; — обрезает всё, что выходит за границы (чтобы не было лишних полос прокрутки).
+#treeContainer: Контейнер под само дерево.
+width: 1200px; height: 800px; — задает жесткие размеры рабочей области, внутри которой будет отрисовываться структура.
 /* === 4. ДЕРЕВО НАВЫКОВ (МОДАЛЬНОЕ ОКНО) === */
 #treeModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 1000; }
 
@@ -58,7 +67,7 @@ line { stroke: #1e293b; stroke-width: 4; transition: 0.5s; opacity: 0; }
 .active-line { stroke: var(--purple); filter: drop-shadow(0 0 5px var(--purple)); opacity: 1; }
 
 .active-matter-line { stroke: var(--matter); filter: drop-shadow(0 0 5px var(--matter)); opacity: 1; }
-
+/* === клик анимация ===*/
 .click-anim { position: absolute; pointer-events: none; color: #60a5fa; font-weight: bold; font-size: 26px; animation: fly 0.7s forwards; text-shadow: 0 0 5px black; z-index: 100; }
 
 @keyframes fly { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-130px); opacity: 0; } }

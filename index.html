@@ -518,18 +518,18 @@ function updateUI() {
     localStorage.setItem('click_v12', JSON.stringify(state));
 
   // запреты 
-function buyMatterNode(id) {
-    let cost = (id===10) ? 12 : (id===11 ? 14 : 80);
-    if (state.boughtNodes.includes(id)) return;
-    if (!state.boughtNodes.includes(10) && id !== 10) return alert("Сначала Синтез!");
-    if (state.matter >= cost) {
-        state.matter -= cost; state.boughtNodes.push(id);
-        if(id===10) { state.matterMultCoins = 2; state.autoPowerMult = 3; }
-        if(id===11) state.matterPerClick = 0.05;
-        if(id===12) { state.treeX2 *= 2; document.getElementById('x15Shop').style.display = 'block'; }
-        updateUI();
-    } else alert("Недостаточно материи!");
-}
+//function buyMatterNode(id) {
+    //let cost = (id===10) ? 12 : (id===11 ? 14 : 80);
+    //if (state.boughtNodes.includes(id)) return;
+   //if (!state.boughtNodes.includes(10) && id !== 10) return alert("Сначала Синтез!");
+   // if (state.matter >= cost) {
+   //     state.matter -= cost; state.boughtNodes.push(id);
+       // if(id===10) { state.matterMultCoins = 2; state.autoPowerMult = 3; }
+       // if(id===11) state.matterPerClick = 0.05;
+       // if(id===12) { state.treeX2 *= 2; document.getElementById('x15Shop').style.display = 'block'; }
+       // updateUI();
+    //} else alert("Недостаточно материи!");
+//}
 // покупки, проверка хватает ли денег и увеличение стоимости по формуле например *1.5
 // так же здесь появляется дерево навыков позволяет тратить очки 
 //есть мой админ код
@@ -547,56 +547,52 @@ function buyX15() { if(state.x15Level < x15Costs.length && state.money >= x15Cos
 function buySuperClick() { if(state.coins>=superCosts[state.superLevel] && state.superLevel < 10){ state.coins-=superCosts[state.superLevel]; state.superLevel++; updateUI(); } }
                // СНАЧАЛА ЦЕНТР запрещает покупать другое пока не купить это
 function buyTreeNode(id) {
-    // 1. Проверка: куплен ли Центр
-    if (id !== 0 && !state.boughtNodes.includes(0)) {
-        return alert("Сначала Центр!");
-    }
-
-    // 2. Если есть поинты и узел еще не куплен
-    if (state.points >= 1 && !state.boughtNodes.includes(id)) {
-        state.points--;
-        state.boughtNodes.push(id);
-
-        // --- ЛОГИКА КАЖДОГО УЗЛА ---
-        if (id === 0) { 
-            state.treeX2 = 2; 
-            state.treeBonusCoins += 1; 
-        }
-        if (id === 1) document.getElementById('secretShop').style.display = 'block';
-        if (id === 2) document.getElementById('x5Shop').style.display = 'block';
-        if (id === 3) state.treeBonusCoins += 2;
-         // Внутри функции buyTreeNode(id) после state.boughtNodes.push(id);
-
-if (id === 3) { // Если купили Мощь (id 3)
-    // Открываем визуально узел материи
-    let node4 = document.getElementById('node4'); 
-    if (node4) node4.style.display = 'flex';
-}
-
-if (id === 4) { // Если купили Трипл килл в дереве (id 4)
-    // Делаем его доступным в магазине
-    let extraShop = document.getElementById('extraUpgradeShop');
-    if (extraShop) extraShop.style.display = 'block';
+    console.log("Нажат узел:", id);
     
-    // Либо сразу даем бонус x3
-    state.x3Level = 1; 
-}
-                // НОВОЕ: Если купили Мощь (id 2), открываем Трипл килл в дереве
-                       if (id === 2) {
-            let n4 = document.getElementById('node4');
-            let line4 = document.getElementById('14'); 
-            if (n4) n4.style.display = 'flex';
-            if (line4) line4.style.opacity = '1';
-        }
- 
+    // Если массива купленных узлов нет, создаем его
+    if (!state.boughtNodes) state.boughtNodes = [];
 
-        // НОВОЕ: Если купили Трипл килл (id 4), открываем его в магазине
-        if (id === 4) {
-            let extraShop = document.getElementById('extraUpgradeShop');
-            if (extraShop) extraShop.style.display = 'block';
+    // --- ЛОГИКА ДЛЯ СИНЕЙ ВЕТКИ (id от 0 до 9) ---
+    if (id < 10) {
+        if (id !== 0 && !state.boughtNodes.includes(0)) {
+            alert("Сначала купи Центр!");
+            return;
         }
 
-        updateUI();
+        if (state.points >= 1 && !state.boughtNodes.includes(id)) {
+            state.points--;
+            state.boughtNodes.push(id);
+            
+            if (id === 0) { state.treeX2 = 2; state.treeBonusCoins += 1; }
+            if (id === 2) { 
+                document.getElementById('node4').style.display = 'flex';
+                document.getElementById('node10').style.display = 'flex';
+            }
+            if (id === 4) { state.x3Level = 1; }
+
+            updateUI();
+        } else {
+            alert("Нужна 1 звезда или уже куплено!");
+        }
+    } 
+    
+    // --- ЛОГИКА ДЛЯ МАТЕРИИ (id от 10 и выше) ---
+    else {
+        // Твоя старая рабочая логика материи
+        let cost = 10; // Базовая цена материи
+        if (state.matter >= cost && !state.boughtNodes.includes(id)) {
+            state.matter -= cost;
+            state.boughtNodes.push(id);
+            
+            if (id === 10) {
+                state.matterMultiplier = (state.matterMultiplier || 1) * 1.5;
+            }
+            
+            updateUI();
+            alert("Улучшение материи куплено!");
+        } else {
+            alert("Недостаточно материи или уже куплено!");
+        }
     }
 }
 

@@ -634,8 +634,10 @@ function resetGame() {
 }
 
 // Открытие и закрытие дерева 
-function openTree() { document.getElementById('treeModal').style.display='block'; }
-function closeTree() { document.getElementById('treeModal').style.display='none'; }
+function openTree() { 
+    document.getElementById('treeModal').style.display = 'block'; 
+    renderTree(); 
+}
 
 // Музыка
 function toggleMusic() { 
@@ -653,21 +655,7 @@ function playTune() {
     osc.start(); osc.stop(audioCtx.currentTime + 3); 
     setTimeout(playTune, 3200); 
 }
-function openTree() {
-    // Находим элемент дерева ребиртов по ID. 
-    // ВАЖНО: Проверь, какой ID у твоего блока с деревом в HTML!
-    // Если у тебя дерево лежит в блоке с id="tree", замени 'skillTree' ниже на 'tree'
-    const tree = document.getElementById('rebirthTree');
-    if (tree) {
-        if (tree.style.display === "none" || tree.style.display === "") {
-            tree.style.display = "block";
-        } else {
-            tree.style.display = "none";
-        }
-    } else {
-        alert("Ошибка: Блок с деревом не найден. Проверь ID в HTML!");
-    }
-}
+
 // Автокликер
 autoInterval = setInterval(() => { 
     if(state && state.autoLevel > 0 && !isResetting){ 
@@ -699,7 +687,41 @@ function buyExtraUpgrade() {
 }
 
 }
+function renderTree() {
+    // 1. Ищем контейнер внутри модального окна
+    const treeContainer = document.getElementById('treeContainer');
+    
+    if (!treeContainer) {
+        console.error("Ошибка: Блок treeContainer не найден!");
+        return;
+    }
 
+    // 2. Очищаем контейнер, чтобы кнопки не дублировались
+    treeContainer.innerHTML = '';
+
+    // 3. Создаем кнопки для каждого улучшения из массива rebirthUpgrades
+    rebirthUpgrades.forEach(upgrade => {
+        const btn = document.createElement('button');
+        btn.className = 'node'; // Используем твой стиль из CSS
+        
+        // Настраиваем внешний вид кнопки (как на твоем макете)
+        btn.innerHTML = `<b>${upgrade.name}</b><br>${upgrade.description}<br>Цена: ${upgrade.cost} ⭐`;
+        
+        // Логика покупки
+        btn.onclick = () => {
+            if (state.rebirthPoints >= upgrade.cost) {
+                state.rebirthPoints -= upgrade.cost;
+                alert("Улучшение '" + upgrade.name + "' куплено!");
+                updateUI();
+                renderTree(); // Обновляем дерево после покупки
+            } else {
+                alert("Недостаточно поинтов!");
+            }
+        };
+
+        treeContainer.appendChild(btn);
+    });
+}
     
     </script>
 </body>

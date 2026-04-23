@@ -317,16 +317,30 @@ let state = {
     extraLevel: 0,        // Текущий уровень улучшения в магазине
     extraCost: 70000000,  // Начальная цена: 70 миллионов
     isExtraUnlocked: false // Флаг: куплено ли оно в дереве
-    const GAME_CONFIG = {
-    // Цены на ребирты
-    rebirthPrices: [100000, 16000000, 870000000, 82e8, 95e12, 11e15, 25e18, 63e22, 2e24, 56e27, 12e30],
+const GAME_CONFIG = {
+    rebirthPrices: [100000, 500000, 2500000, 10000000, 50000000, 250000000, 1000000000, 5000000000]
+
+
+function rebirth() {
+    const currentPrice = GAME_CONFIG.rebirthPrices[state.rebirths] || state.rebirthCost;
+
+    if (state.money >= currentPrice) {
+        state.money = 0;
+        state.rebirths++;
+        state.points++;
+        
+        state.rebirthCost = GAME_CONFIG.rebirthPrices[state.rebirths] || currentPrice * 5;
+
+        saveGame();
+        updateUI();
+    }
 }
     // Сюда можешь дописывать другие цены, например:
     // upgradeCosts: [500, 1000, 5000],
     // extraClickCost: 1500
 };
     
-}
+
 
 
 // ТВОИ ЦЕНЫ И ОБНОВЛЕННЫЕ ЗНАЧЕНИЯ X1.5
@@ -725,88 +739,36 @@ function buyExtraUpgrade() {
         alert("Недостаточно денег для Мастера Клика!");
     
 function buyTreeNode(id) {
-    // 1. Инициализация, если нужно
     if (!state.boughtNodes) state.boughtNodes = [];
-
-    // 2. Если уже куплено — выходим
     if (state.boughtNodes.includes(id)) return;
-
-    // 3. УСЛОВИЯ ЦЕПОЧКИ (Проверки на последовательность)
-    // Нельзя купить ничего, кроме Центра (0), пока не куплен Центр
     if (id !== 0 && !state.boughtNodes.includes(0)) return;
-
-    // Узлы 11 и 12 требуют купленного узла 10 (Синтез)
     if ((id === 11 || id === 12) && !state.boughtNodes.includes(10)) return;
 
-    // 4. ПРОЦЕСС ПОКУПКИ
     if (state.points >= 1) {
         state.points -= 1;
         state.boughtNodes.push(id);
 
-        // --- ЭФФЕКТЫ УЗЛОВ ---
         if (id === 0) {
             state.clickPower *= 2;
-        } 
-        else if (id === 3) {
-            // Открываем ПЕРВУЮ кнопку секретной ветки (Синтез)
+        } else if (id === 3) {
             const node10 = document.getElementById('node10');
             if (node10) node10.style.display = 'block';
-        }
-        else if (id === 10) {
-            // Открываем следующие кнопки ветки материи
-            const node11 = document.getElementById('node11');
-            const node12 = document.getElementById('node12');
-            if (node11) node11.style.display = 'block';
-            if (node12) node12.style.display = 'block';
+        } else if (id === 10) {
+            const n11 = document.getElementById('node11');
+            const n12 = document.getElementById('node12');
+            if (n11) n11.style.display = 'block';
+            if (n12) n12.style.display = 'block';
         }
 
-        // --- ВИЗУАЛЬНОЕ ОБНОВЛЕНИЕ КНОПКИ ---
         const btn = document.getElementById('node' + id);
         if (btn) {
-            btn.classList.add('bought'); // Включает фиолетовое свечение из CSS
-            // Заменяем текст цены на галочку
+            btn.classList.add('bought');
             btn.innerHTML = btn.innerHTML.replace("1 ⭐", "✔️");
         }
 
-        updateUI(); // Обновляем баланс звезд на экране
-    }
-}
-
-        // ВОЗВРАЩАЕМ ПОДСВЕТКУ
-        const btn = document.getElementById('node' + id);
-        if (btn) {
-            btn.style.boxShadow = "0 0 20px 5px rgba(191, 125, 255, 0.8)"; // Фиолетовое свечение
-            btn.style.borderColor = "#bf7dff";
-            btn.style.background = "rgba(191, 125, 255, 0.2)";
-        }
-
         updateUI();
-    } else {
-        // Если хочешь сообщение о нехватке, но без алертов — можно выводить в консоль
-        console.log("Нужна звезда!");
     }
-
-        // ЭФФЕКТЫ (без алертов)
-        if (id === 0) {
-            state.clickPower *= 2;
-        } 
-        else if (id === 3) {
-            // Открываем ПЕРВУЮ кнопку материи (node10)
-            const node10 = document.getElementById('node10');
-            if (node10) node10.style.display = 'block';
-        }
-        else if (id === 10) {
-            // Если купили Синтез (10), открываем Поток (11) и Разрыв (12)
-            const node11 = document.getElementById('node11');
-            const node12 = document.getElementById('node12');
-            if (node11) node11.style.display = 'block';
-            if (node12) node12.style.display = 'block';
-        }
-        // Находим элемент с ценой внутри кнопки и меняем текст
-        const priceTag = btn.querySelector('b'); // Если цена в теге <b>
-        if (btn) {
-             btn.innerHTML = btn.innerHTML.replace("1 ⭐", "✔"); // Заменяем текст цены на галочку
-        }
+} // <--- ПРОВЕРЬ, ЧТО ЭТА СКОБКА ЕСТЬ
 
         // Визуально помечаем кнопку как купленную
         const btn = document.getElementById('node' + id);

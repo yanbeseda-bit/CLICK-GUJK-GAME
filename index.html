@@ -248,34 +248,37 @@ line { stroke: #1e293b; stroke-width: 4; transition: 0.5s; opacity: 0; }
         <line id="ml1" x1="200" y1="300" x2="100" y2="200" />
         <line id="ml2" x1="100" y1="200" x2="100" y2="50" />
         <line id="ml3" x1="100" y1="200" x2="250" y2="100" />
-    </svg><div id="node0" class="node" style="left: 400px; top: 300px;" onclick="buyTreeNode(0)">
-    <b>Центр</b><br>Сила x2, +1 мон.<br>1 ⭐</div>
-            <!-- Узел 1: Удача -->
-    <div id="node1" class="node" style="left: 600px; top: 300px;" onclick="buyTreeNode(1)">
-        <b>Удача</b><br>Магазин монет<br>1 ⭐
+    <div class="tree-container">
+    <div id="node0" class="tree-node" onclick="buyTreeNode(0)">
+        <span class="node-title">Центр</span>
+        <span class="node-desc">Сила x2, +1 мон.</span>
+        <span class="node-price">1 ⭐</span>
     </div>
 
-    <!-- Узел 2: Мощь -->
-    <div id="node2" class="node" style="left: 400px; top: 500px;" onclick="buyTreeNode(2)">
-        <b>Мощь</b><br>Открыть x5<br>1 ⭐
+    <div id="node1" class="tree-node" onclick="buyTreeNode(1)">
+        <span class="node-title">Удача</span>
+        <span class="node-desc">Магазин монет</span>
+        <span class="node-price">1 ⭐</span>
     </div>
 
-    <!-- Узел 4: Трипл килл -->
-    <div id="node4" class="node triple-kill" style="left: 400px; top: 700px; display: none;" onclick="buyTreeNode(4)">
-        <b style="font-size: 14px;">🔥 Трипл килл</b><br>
-        Открыть +3 улучшение<br>
-        <b style="color:var(--gold)">1 ⭐</b>
+    <div id="node2" class="tree-node" onclick="buyTreeNode(2)">
+        <span class="node-title">Мощь</span>
+        <span class="node-desc">Открыть x3 и Материю</span>
+        <span class="node-price">1 ⭐</span>
     </div>
 
-        <div id="node3" class="node" style="left: 200px; top: 300px;" onclick="buyTreeNode(3)"><b>Материя</b>
-                <br>+0.01 мат/клик<br>+2 монеты<br>1 ⭐</div>
-        <div id="node10" class="node matter-node" style="left: 100px; top: 200px; display:none" onclick="buyMatterNode(10)"><b>Синтез</b><br>x2 мон.,
-                 Авто x3<br>12 ⚛️</div>
-        <div id="node11" class="node matter-node" style="left: 100px; top: 50px; display:none" onclick="buyMatterNode(11)">
-                 <b>Поток</b><br>+0.05 мат/клик<br>14 ⚛️</div>
-        <div id="node12" class="node matter-node" style="left: 250px; top: 100px; display:none" onclick="buyMatterNode(12)">
-                <b>Разрыв</b><br>x2 Клик + Магаз<br>80 ⚛️</div></div></div></div>
+    <div id="node4" class="tree-node" style="display: none;" onclick="buyTreeNode(4)">
+        <span class="node-title">Трипл Килл</span>
+        <span class="node-desc">Активировать x3</span>
+        <span class="node-price">1 ⭐</span>
+    </div>
 
+    <div id="node10" class="tree-node" style="display: none;" onclick="buyTreeNode(10)">
+        <span class="node-title">Материя I</span>
+        <span class="node-desc">+0.01 мат/клик</span>
+        <span class="node-price">1 ⭐</span>
+    </div>
+</div>
 <!-- Зброс всего? -->
 <script>
 let autoInterval = null, isResetting = false;
@@ -432,13 +435,18 @@ function updateUI() {
     //Условие if (state.megaLevel < 5): Если уровень меньше 5, код показывает цену следующего улучшения.
     //else (Блок MAX): Если ты купил все 5 уровней, цена меняется на текст "MAX", а кнопка становится серой (disabled = true), чтобы ты не тратил монеты впустую.
     }
-    function rebirth() {
-        
-    let goal = (typeof rebirthGoals !== 'undefined' && rebirthGoals[state.rebirths]) 
-               ? rebirthGoals[state.rebirths] 
-               : 100000;
+   function rebirth() {
+    // Проверяем, не достигли ли мы конца списка цен
+    if (state.rebirths >= rebirthGoals.length) {
+        alert("У тебя МАКСИМАЛЬНЫЙ ребирт!");
+        return;
+    }
+
+    // Берем цену четко из твоего массива (строка 308)
+    let goal = rebirthGoals[state.rebirths];
 
     if (state.money >= goal) {
+        // СБРОС (ИИ тут обнуляет всё, проверь, нужно ли тебе это)
         state.money = 0;
         state.moneyUpgrade = 0;
         state.moneyUpgradeCost = 30;
@@ -446,12 +454,15 @@ function updateUI() {
         state.autoCost = 2000;
         state.x3Level = 0;
         state.x5Level = 0;
+
+        // Добавляем ребирт и звезду (поинт)
         state.rebirths++;
         state.points++; 
+
         updateUI();
-        //alert("Ребирт выполнен! Получен 1 ⭐");
+        console.log("Ребирт куплен! Цена следующего будет: " + rebirthGoals[state.rebirths]);
     } else {
-       // alert("Нужно больше денег!");
+        alert("Нужно еще " + formatNum(goal - state.money) + " монет!");
     }
 }
 
@@ -554,7 +565,22 @@ function buyTreeNode(id) {
         if (id === 1) document.getElementById('secretShop').style.display = 'block';
         if (id === 2) document.getElementById('x5Shop').style.display = 'block';
         if (id === 3) state.treeBonusCoins += 2;
+         // Внутри функции buyTreeNode(id) после state.boughtNodes.push(id);
 
+if (id === 3) { // Если купили Мощь (id 3)
+    // Открываем визуально узел материи
+    let node4 = document.getElementById('node4'); 
+    if (node4) node4.style.display = 'flex';
+}
+
+if (id === 4) { // Если купили Трипл килл в дереве (id 4)
+    // Делаем его доступным в магазине
+    let extraShop = document.getElementById('extraUpgradeShop');
+    if (extraShop) extraShop.style.display = 'block';
+    
+    // Либо сразу даем бонус x3
+    state.x3Level = 1; 
+}
                 // НОВОЕ: Если купили Мощь (id 2), открываем Трипл килл в дереве
                        if (id === 2) {
             let n4 = document.getElementById('node4');

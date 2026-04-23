@@ -113,6 +113,15 @@ line { stroke: #1e293b; stroke-width: 4; transition: 0.5s; opacity: 0; }
 .click-anim { position: absolute; pointer-events: none; color: #60a5fa; font-weight: bold; font-size: 26px; animation: fly 0.85s forwards; text-shadow: 0 0 5px black; z-index: 100; }
 
 @keyframes fly { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-130px); opacity: 0; } }
+    #treeModal .close-btn:hover {
+    color: #ff5555;
+} /* <--- Закрывающая скобка старого стиля */
+
+.node.bought {
+    box-shadow: 0 0 20px 5px rgba(191, 125, 255, 0.8) !important;
+    border-color: #bf7dff !important;
+    background: rgba(191, 125, 255, 0.3) !important;
+}
 </style>
 <!-- ВСЕ В ВЕРХУ - мало информации но это интерфейс и кольоры-->
     
@@ -308,6 +317,14 @@ let state = {
     extraLevel: 0,        // Текущий уровень улучшения в магазине
     extraCost: 70000000,  // Начальная цена: 70 миллионов
     isExtraUnlocked: false // Флаг: куплено ли оно в дереве
+    const GAME_CONFIG = {
+    // Цены на ребирты
+    rebirthPrices: [100000, 16000000, 870000000, 82e8, 95e12, 11e15, 25e18, 63e22, 2e24, 56e27, 12e30],
+    
+    // Сюда можешь дописывать другие цены, например:
+    // upgradeCosts: [500, 1000, 5000],
+    // extraClickCost: 1500
+};
 
 }
 
@@ -318,7 +335,7 @@ const x5Costs = [87000000, 65e9, 1e13, 17e14, 485e15, 65e17, 19e19, 23e21, 83e23
 const x15Costs = [12e13, 45e15, 92e17, 92e19, 19e22, 23e24, 46e26, 21e27, 82e28, 35e31]; // 12B и 450B
 const superCosts = [200, 700, 3000, 7000, 16000, 40000, 140000, 370000, 650000, 1000000];
 const megaCosts = [200, 1000, 2000, 5000, 18000];
-const rebirthGoals = [100000, 16000000, 870000000, 82e8, 95e12, 11e15, 25e18, 63e22, 2e24, 56e27, 12e30];
+//const rebirthGoals = [100000, 16000000, 870000000, 82e8, 95e12, 11e15, 25e18, 63e22, 2e24, 56e27, 12e30];
 // Сколько опыта нужно для каждого следующего уровня
 const levelGoals = [15, 20, 25, 35, 45, 60, 70, 85, 100, 105, 110, 115, 130, 140, 160, 170, 190, 195, 200, 205, 230, 240, 260, 270, 290, 330, 345, 360, 365, 390, 400, 410, 440, 470, 500, 530, 550, 600, 640, 700, 760, 790, 810, 860, //44 лвл
 920, 1000, 1030, 1065, 1100, 1140, 1180, 1200, 1250, 1300, 1350, 1400, 1450, 1500, 1550, 1600, 1650, 1700, 1750, 1800, 1850, 1900, 1950, 2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000, 3100, 3200, 3500, 3800, 4000, //83 лвл
@@ -569,18 +586,22 @@ function buyTreeNode(id) {
             return;
         }
 
-        if (state.points >= 1 && !state.boughtNodes.includes(id)) {
-            state.points--;
-            state.boughtNodes.push(id);
-            
-            if (id === 0) { state.treeX2 = 2; state.treeBonusCoins += 1; }
-            if (id === 2) { 
-                document.getElementById('node4').style.display = 'flex';
-                document.getElementById('node10').style.display = 'flex';
-            }
-            if (id === 4) { state.x3Level = 1; }
+        function rebirth() {
+    // Берем текущую цену из нашего нового конфига (GAME_CONFIG)
+    const currentPrice = GAME_CONFIG.rebirthPrices[state.rebirths] || state.rebirthCost;
 
-            updateUI();
+    if (state.money >= currentPrice) {
+        state.money = 0;
+        state.rebirths++;
+        state.points++;
+        
+        // Ставим цену для следующего ребирта из списка
+        state.rebirthCost = GAME_CONFIG.rebirthPrices[state.rebirths] || currentPrice * 5;
+
+        saveGame();
+        updateUI();
+    }
+}
         } else {
             alert("Нужна 1 звезда или уже куплено!");
         }
@@ -635,14 +656,24 @@ function resetGame() {
 
 // Открытие и закрытие дерева 
 function openTree() {
-    const modal = document.getElementById('treeModal');
-    if (modal) {
-        modal.style.display = 'block';
+    document.getElementById('treeModal').style.display = 'block';
+    
+    // Проверяем все купленные узлы и восстанавливаем их вид
+    if (state.boughtNodes) {
+        state.boughtNodes.forEach(id => {
+            const btn = document.getElementById('node' + id);
+            if (btn) {
+                btn.classList.add('bought');
+                btn.innerHTML = btn.innerHTML.replace(/1\s?⭐/g, "✔️");
+            }
+        });
+    }
+}
         // Если ты все же хочешь использовать динамические кнопки, оставь renderTree()
         // Если используешь только те кнопки, что уже написаны в HTML — удали строку ниже
         
-    }
-}
+    
+
 function closeTree() {
     const modal = document.getElementById('treeModal');
     if (modal) {
@@ -693,24 +724,67 @@ function buyExtraUpgrade() {
     } else {
         alert("Недостаточно денег для Мастера Клика!");
     
-    function buyTreeNode(id) {
-    // 1. Создаем список купленных узлов, если игра только началась
+function buyTreeNode(id) {
+    // 1. Инициализация, если нужно
     if (!state.boughtNodes) state.boughtNodes = [];
 
-    // 2. Если уже куплено — ничего не делаем
+    // 2. Если уже куплено — выходим
     if (state.boughtNodes.includes(id)) return;
 
-    // 3. УСЛОВИЯ ЦЕПОЧКИ (Обязательный порядок)
+    // 3. УСЛОВИЯ ЦЕПОЧКИ (Проверки на последовательность)
     // Нельзя купить ничего, кроме Центра (0), пока не куплен Центр
     if (id !== 0 && !state.boughtNodes.includes(0)) return;
 
-    // Кнопки 11 и 12 требуют купленной кнопки 10 (Синтез)
+    // Узлы 11 и 12 требуют купленного узла 10 (Синтез)
     if ((id === 11 || id === 12) && !state.boughtNodes.includes(10)) return;
 
-    // 4. ПОКУПКА
+    // 4. ПРОЦЕСС ПОКУПКИ
     if (state.points >= 1) {
         state.points -= 1;
-        state.boughtNodes.push(id); // Запоминаем покупку
+        state.boughtNodes.push(id);
+
+        // --- ЭФФЕКТЫ УЗЛОВ ---
+        if (id === 0) {
+            state.clickPower *= 2;
+        } 
+        else if (id === 3) {
+            // Открываем ПЕРВУЮ кнопку секретной ветки (Синтез)
+            const node10 = document.getElementById('node10');
+            if (node10) node10.style.display = 'block';
+        }
+        else if (id === 10) {
+            // Открываем следующие кнопки ветки материи
+            const node11 = document.getElementById('node11');
+            const node12 = document.getElementById('node12');
+            if (node11) node11.style.display = 'block';
+            if (node12) node12.style.display = 'block';
+        }
+
+        // --- ВИЗУАЛЬНОЕ ОБНОВЛЕНИЕ КНОПКИ ---
+        const btn = document.getElementById('node' + id);
+        if (btn) {
+            btn.classList.add('bought'); // Включает фиолетовое свечение из CSS
+            // Заменяем текст цены на галочку
+            btn.innerHTML = btn.innerHTML.replace("1 ⭐", "✔️");
+        }
+
+        updateUI(); // Обновляем баланс звезд на экране
+    }
+}
+
+        // ВОЗВРАЩАЕМ ПОДСВЕТКУ
+        const btn = document.getElementById('node' + id);
+        if (btn) {
+            btn.style.boxShadow = "0 0 20px 5px rgba(191, 125, 255, 0.8)"; // Фиолетовое свечение
+            btn.style.borderColor = "#bf7dff";
+            btn.style.background = "rgba(191, 125, 255, 0.2)";
+        }
+
+        updateUI();
+    } else {
+        // Если хочешь сообщение о нехватке, но без алертов — можно выводить в консоль
+        console.log("Нужна звезда!");
+    }
 
         // ЭФФЕКТЫ (без алертов)
         if (id === 0) {
@@ -727,6 +801,11 @@ function buyExtraUpgrade() {
             const node12 = document.getElementById('node12');
             if (node11) node11.style.display = 'block';
             if (node12) node12.style.display = 'block';
+        }
+        // Находим элемент с ценой внутри кнопки и меняем текст
+        const priceTag = btn.querySelector('b'); // Если цена в теге <b>
+        if (btn) {
+             btn.innerHTML = btn.innerHTML.replace("1 ⭐", "✔"); // Заменяем текст цены на галочку
         }
 
         // Визуально помечаем кнопку как купленную

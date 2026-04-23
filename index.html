@@ -320,7 +320,7 @@ let state = {
 }; // <--- ВОТ ЭТО ЗАКРЫВАЕТ ОБЪЕКТ state // Флаг: куплено ли оно в дереве
 const GAME_CONFIG = {
     rebirthPrices: [100000, 500000, 2500000, 10000000, 50000000, 250000000, 1000000000, 5000000000]
-
+};
 
 function rebirth() {
     const currentPrice = GAME_CONFIG.rebirthPrices[state.rebirths] || state.rebirthCost;

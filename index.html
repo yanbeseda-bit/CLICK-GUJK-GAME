@@ -643,7 +643,12 @@ function openTree() {
         
     }
 }
-
+function closeTree() {
+    const modal = document.getElementById('treeModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
 // Музыка
 function toggleMusic() { 
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); 
@@ -689,49 +694,46 @@ function buyExtraUpgrade() {
         alert("Недостаточно денег для Мастера Клика!");
     
     function buyTreeNode(id) {
-    // Создаем в state список купленных узлов, если его еще нет
+    // 1. Создаем список купленных узлов, если игра только началась
     if (!state.boughtNodes) state.boughtNodes = [];
 
-    // 1. Проверяем, не куплен ли уже этот узел
+    // 2. Если уже куплено — ничего не делаем
     if (state.boughtNodes.includes(id)) return;
 
-    // 2. УСЛОВИЯ ПОСЛЕДОВАТЕЛЬНОСТИ (Цепочка)
-    // Если это не Центр (id 0), проверяем, куплен ли Центр
-    if (id !== 0 && !state.boughtNodes.includes(0)) {
-        return; // Ничего не делаем, пока не купят Центр
-    }
+    // 3. УСЛОВИЯ ЦЕПОЧКИ (Обязательный порядок)
+    // Нельзя купить ничего, кроме Центра (0), пока не куплен Центр
+    if (id !== 0 && !state.boughtNodes.includes(0)) return;
 
-    // Условие для глубокой ветки материи (кнопки 11 и 12 требуют кнопку 10)
-    if ((id === 11 || id === 12) && !state.boughtNodes.includes(10)) {
-        return; 
-    }
+    // Кнопки 11 и 12 требуют купленной кнопки 10 (Синтез)
+    if ((id === 11 || id === 12) && !state.boughtNodes.includes(10)) return;
 
-    // 3. ПОКУПКА
+    // 4. ПОКУПКА
     if (state.points >= 1) {
         state.points -= 1;
-        state.boughtNodes.push(id); // Запоминаем, что купили этот узел
+        state.boughtNodes.push(id); // Запоминаем покупку
 
-        // Применяем эффекты
+        // ЭФФЕКТЫ (без алертов)
         if (id === 0) {
             state.clickPower *= 2;
         } 
         else if (id === 3) {
-            // Открываем первые кнопки материи
-            document.querySelectorAll('.matter-node').forEach(el => {
-                if (el.id === "node10") el.style.display = 'block'; 
-            });
+            // Открываем ПЕРВУЮ кнопку материи (node10)
+            const node10 = document.getElementById('node10');
+            if (node10) node10.style.display = 'block';
         }
         else if (id === 10) {
-            // Если купили Синтез (10), открываем Поток и Разрыв
-            document.getElementById('node11').style.display = 'block';
-            document.getElementById('node12').style.display = 'block';
+            // Если купили Синтез (10), открываем Поток (11) и Разрыв (12)
+            const node11 = document.getElementById('node11');
+            const node12 = document.getElementById('node12');
+            if (node11) node11.style.display = 'block';
+            if (node12) node12.style.display = 'block';
         }
 
-        // Визуально помечаем кнопку как купленную (по желанию)
+        // Визуально помечаем кнопку как купленную
         const btn = document.getElementById('node' + id);
-        if (btn) btn.classList.add('bought');
+        if (btn) btn.style.filter = "brightness(0.6) sepia(1) hue-rotate(100deg)";
 
-        updateUI();
+        updateUI(); // Обновляем баланс звезд на экране
     }
 }
 }

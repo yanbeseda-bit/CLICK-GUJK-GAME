@@ -617,37 +617,24 @@ function buyTreeNode(id) {
         updateUI();
     
 
-       } else {
-            alert("Нужна 1 звезда или уже куплено!");
-        }
-    } else if (id >= 10) {
+      } else {
+        alert("нужно 1 поинт!"); 
     }
-}
-    
-    
-    
-    
-    
-    // --- ЛОГИКА ДЛЯ МАТЕРИИ (id от 10 и выше) ---
-    
-        // Твоя старая рабочая логика материи
-        let cost = 10; // Базовая цена материи
+
+    // Теперь проверяем ID отдельно
+    if (id >= 10) {
+        // --- ЛОГИКА ДЛЯ МАТЕРИИ (теперь она внутри условия) ---
+        let cost = 10; 
         if (state.matter >= cost && !state.boughtNodes.includes(id)) {
             state.matter -= cost;
             state.boughtNodes.push(id);
-            
+
             if (id === 10) {
                 state.matterMultiplier = (state.matterMultiplier || 1) * 1.5;
             }
-            
-            updateUI();
-            alert("Улучшение материи куплено!");
-        } else {
-            alert("Недостаточно материи или уже куплено!");
         }
-    
-}
-
+    } // Вот эта скобка теперь закрывает проверку id >= 10
+        }
      // админ код
 function enterPromoCode() {
     let code = prompt("Введите код:"); 
